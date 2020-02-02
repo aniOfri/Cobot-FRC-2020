@@ -11,36 +11,27 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.VictorSP;
 
-// Import Camera
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.cscore.AxisCamera;
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
-import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.UsbCamera;
-
-// Import Image Processing
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
-import org.opencv.videoio.VideoCapture;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class Robot extends TimedRobot {
-  Joystick stick;
-  VictorSP[] motors;
-  VictorSP[] shooter;
-  VideoCapture capture;
-  UsbCamera cam;
+  Joystick stick = new Joystick(0);
+  /*VictorSPX V1 = new VictorSPX(0);
+  VictorSPX V2 = new VictorSPX(1);
+  VictorSPX V3 = new VictorSPX(2);
+  VictorSPX V4 = new VictorSPX(3);
+
+  SpeedControllerGroup Left = new SpeedControllerGroup(V1,V2);
+  SpeedControllerGroup Right = new SpeedControllerGroup(V3,V4);
+  DifferentialDrive drive = new DifferentialDrive(Left, Right);*/
+
+  VictorSPX[] motors;
+  VictorSP[] climb;
+
+  //VictorSPX[] shooter;
 
   /*
     Initialize all variables at deploy.
@@ -63,19 +54,25 @@ public class Robot extends TimedRobot {
     // Initialize stick as a Joystick 
     stick = new Joystick(0);
 
-    // Initialize motors as a two-item array
-    motors = new VictorSP[7];
-    // Set item one as motor one
-    motors[0] = new VictorSP(0);
-    // Set item two as motor two
-    motors[1] = new VictorSP(1);
-    // Set item three as motor three
-    motors[2] = new VictorSP(2);
-    // Set item four as motor four
-    motors[3] = new VictorSP(3);
-    // Set item four as camera motor
-    motors[4] = new VictorSP(4);
     
+    // Initialize motors as a two-item array
+    motors = new VictorSPX[7];
+    // Set item one as motor one
+    motors[0] = new VictorSPX(0);
+    // Set item two as motor two
+    motors[1] = new VictorSPX(1);
+    // Set item three as motor three
+    motors[2] = new VictorSPX(2);
+    // Set item four as motor four
+    motors[3] = new VictorSPX(3);
+    // Set item four as camera motor
+    //motors[4] = new VictorSP(4);
+    
+    climb = new VictorSP[3];
+    climb[0] = new VictorSP(0);
+    climb[1] = new VictorSP(1);
+    climb[2] = new VictorSP(2);
+
     /* Initialize motors as a two-item array 
     for shooting mechanism
 
@@ -105,6 +102,31 @@ public class Robot extends TimedRobot {
     throttle = stick.getThrottle();
     trigger = stick.getTrigger();
 
+    //drive.arcadeDrive(stick.getRawAxis(1),stick.getRawAxis(0));
+    
+    if(stick.getRawButton(5)){
+      climb[0].set(0.5);
+      climb[1].set(0.5);
+    }
+    else if(stick.getRawButton(3)){
+      climb[0].set(-0.5);
+      climb[1].set(-0.5);
+    }
+    else{
+      climb[0].set(0);
+      climb[1].set(0);
+    }
+
+    if(stick.getRawButton(6)){
+      climb[2].set(1);
+    }
+    else if(stick.getRawButton(4)){
+      climb[2].set(-1);
+    }
+    else{
+      climb[2].set(0);
+     
+    }
     // SmartDashboard
     SmartDashboard.putNumber("Throttle: ", throttle);
     SmartDashboard.putBoolean("Trigger: ", trigger);
@@ -156,9 +178,13 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("FinalL", finalL);
 
         // Sending values to motor(0), motor(1)
-        motors[0].set(finalR);
-        motors[1].set(finalR);
-        motors[2].set(finalL);
-        motors[3].set(finalL);
+        
+        SmartDashboard.putNumber("finalR", finalR);
+        SmartDashboard.putNumber("finalL", finalL);
+
+        motors[0].set(ControlMode.PercentOutput, finalR);
+        motors[1].set(ControlMode.PercentOutput, finalR);
+        motors[2].set(ControlMode.PercentOutput, finalL);
+        motors[3].set(ControlMode.PercentOutput, finalL);
     }
 }
