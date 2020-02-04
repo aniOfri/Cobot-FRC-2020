@@ -57,7 +57,13 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // Movement
+<<<<<<< HEAD
     //drive.movement();
+=======
+    drive.movement();
+
+
+>>>>>>> master
 
     // Climbing/
     climb.manualClimbing();
