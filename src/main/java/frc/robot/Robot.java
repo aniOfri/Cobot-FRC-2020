@@ -16,15 +16,15 @@ import edu.wpi.first.wpilibj.VictorSP;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 
 
 public class Robot extends TimedRobot {
   Joystick stick;
   //VictorSPX[] shooter;
-  TalonSRX[] climb;
-  VictorSP balance;
   drivingSubsystem drive;
+  climbingSubsystem climb;
   /*
     Initialize all variables at deploy.
     
@@ -45,15 +45,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Initialize stick as a Joystick 
     stick = new Joystick(0);
-    
-    // Initialize climb as a three-item array
-    climb = new TalonSRX[2];
-    // Initialization
-    climb[0] = new TalonSRX(5);//right motor
-    climb[1] = new TalonSRX(4);//left motor
-    balance = new VictorSP(0);
 
+    // Initialize subsystems
     drive = new drivingSubsystem();
+    climb = new climbingSubsystem();
 
     /* 
     //Initialize shooter as a two-item array 
@@ -68,28 +63,8 @@ public class Robot extends TimedRobot {
     // Movement
     drive.movement();
 
-    if(stick.getRawButton(3)){
-      climb[0].set(ControlMode.PercentOutput, 0.5);//right motor
-      climb[1].set(ControlMode.PercentOutput, -0.5);//left motor
-    }
-    else if(stick.getRawButton(5)){
-      climb[0].set(ControlMode.PercentOutput, -0.5);
-      climb[1].set(ControlMode.PercentOutput, 0.5);
-    }
-    else{
-      climb[0].set(ControlMode.PercentOutput, 0);
-      climb[1].set(ControlMode.PercentOutput, 0);
-    }
-
-    if(stick.getRawButton(4))
-      balance.set(1);
-    else if(stick.getRawButton(6))
-      balance.set(-1);
-    else
-      balance.set(0);
-
-    // SmartDashboard
-    SmartDashboard.putBoolean("Trigger: ", stick.getTrigger());
+    // Climbing
+    climb.manualClimbing();
 
     /*
     // If trigger is pressed

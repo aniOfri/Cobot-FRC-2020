@@ -19,8 +19,8 @@ public class drivingSubsystem extends SubsystemBase {
 
     public drivingSubsystem() {
         // Initialize motors
-        left_front=new VictorSPX(4);
-        left_rear=new VictorSPX(3);
+        left_front=new VictorSPX(3);
+        left_rear=new VictorSPX(2);
         right_front=new VictorSPX(0);
         right_rear=new VictorSPX(1);
 
