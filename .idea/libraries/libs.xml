@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/libs/Shooter.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/libs/CoBot.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/libs/CoBot-FRC-2020.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
