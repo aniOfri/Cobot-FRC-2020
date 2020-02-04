@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class climbingSubsystem extends SubsystemBase {
@@ -29,6 +30,7 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     public void manualClimbing(){
+        SmartDashboard.putString("hEllo"," asdads");
         if(stick.getRawButton(3)){
             right_motor.set(ControlMode.PercentOutput, 0.5);//right motor
             left_motor.set(ControlMode.PercentOutput, -0.5);//left motor

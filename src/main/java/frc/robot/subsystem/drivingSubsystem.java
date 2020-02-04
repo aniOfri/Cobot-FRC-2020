@@ -59,11 +59,11 @@ public class drivingSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("FinalR", finalR);
         SmartDashboard.putNumber("FinalL", finalL);
 
-        // Sending values to motor(0), motor(1)
+        // Sending values to motors
         right_front.set(ControlMode.PercentOutput, finalR);
-        right_front.follow(right_rear);
+        right_rear.set(ControlMode.PercentOutput, finalR);
         left_front.set(ControlMode.PercentOutput, finalL);
-        left_front.follow(left_rear);
+        left_rear.set(ControlMode.PercentOutput, finalL);
     }
 }
 

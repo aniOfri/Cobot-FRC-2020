@@ -8,17 +8,25 @@
 package frc.robot;
 
 // Import Essentials
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
-
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Robot extends TimedRobot {
   Joystick stick;
   //VictorSPX[] shooter;
   drivingSubsystem drive;
   climbingSubsystem climb;
+
+  VictorSPX left_front;
+  VictorSPX left_rear;
+  VictorSPX right_front;
+  VictorSPX right_rear;
+
 
   @Override
   public void robotInit() {
@@ -28,6 +36,15 @@ public class Robot extends TimedRobot {
     // Initialize subsystems
     drive = new drivingSubsystem();
     climb = new climbingSubsystem();
+
+    // Initialize motors
+    left_front=new VictorSPX(3);
+    left_rear=new VictorSPX(2);
+    right_front=new VictorSPX(0);
+    right_rear=new VictorSPX(1);
+
+    // Initialize joystick
+    stick = new Joystick(0);
 
     /* 
     //Initialize shooter as a two-item array 
