@@ -14,18 +14,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.VictorSP;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import frc.robot.subsystem.drivingSubsystem;
 
 
 public class Robot extends TimedRobot {
   Joystick stick;
-  VictorSPX[] motors;
   //VictorSPX[] shooter;
   TalonSRX[] climb;
   VictorSP balance;
-
+  drivingSubsystem drive;
   /*
     Initialize all variables at deploy.
     
@@ -46,22 +45,15 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Initialize stick as a Joystick 
     stick = new Joystick(0);
-
-    
-    // Initialize motors as a four-item array
-    motors = new VictorSPX[4];
-    // Initialization
-    motors[0] = new VictorSPX(0);
-    motors[1] = new VictorSPX(1);
-    motors[2] = new VictorSPX(2);
-    motors[3] = new VictorSPX(3);
     
     // Initialize climb as a three-item array
     climb = new TalonSRX[2];
     // Initialization
-    climb[0] = new TalonSRX(0);
-    climb[1] = new TalonSRX(1);
+    climb[0] = new TalonSRX(5);//right motor
+    climb[1] = new TalonSRX(4);//left motor
     balance = new VictorSP(0);
+
+    drive = new drivingSubsystem();
 
     /* 
     //Initialize shooter as a two-item array 
@@ -74,15 +66,15 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // Movement
-    movement();
+    drive.movement();
 
-    if(stick.getRawButton(4)){
-      climb[0].set(ControlMode.PercentOutput, 0.5);
-      climb[1].set(ControlMode.PercentOutput, 0.5);
+    if(stick.getRawButton(3)){
+      climb[0].set(ControlMode.PercentOutput, 0.5);//right motor
+      climb[1].set(ControlMode.PercentOutput, -0.5);//left motor
     }
-    else if(stick.getRawButton(4) && stick.getTop()){
+    else if(stick.getRawButton(5)){
       climb[0].set(ControlMode.PercentOutput, -0.5);
-      climb[1].set(ControlMode.PercentOutput, -0.5);
+      climb[1].set(ControlMode.PercentOutput, 0.5);
     }
     else{
       climb[0].set(ControlMode.PercentOutput, 0);
@@ -91,7 +83,7 @@ public class Robot extends TimedRobot {
 
     if(stick.getRawButton(4))
       balance.set(1);
-    else if(stick.getRawButton(4) && stick.getTop())
+    else if(stick.getRawButton(6))
       balance.set(-1);
     else
       balance.set(0);
@@ -110,44 +102,5 @@ public class Robot extends TimedRobot {
       shooter[0].set(0);
       shooter[1].set(0);
     }*/
-    }
-
-  public void movement(){
-        // Declare variables
-        double maxLim,
-        sqrt,
-        xVal,
-        yVal,
-        finalL = 0,
-        finalR = 0;
-
-        // Get Joystick's input
-        xVal = stick.getX();
-        yVal = -stick.getY();
-
-        // Algorithm Beep Boop *-*
-        if (yVal > 0.2 || yVal < -0.2){
-            int negFix = yVal < -0.2 ? -1 : 1,
-                negPos = (int)(yVal / Math.abs(yVal));
-
-            maxLim = 0.85;
-            sqrt = Math.sqrt(xVal * xVal + yVal * yVal);
-
-            finalL = sqrt * maxLim * negPos;
-            finalR = (sqrt + (0.8 * xVal * -negPos * negFix)) * maxLim * -negPos;
-        }
-        else{
-            finalL = xVal;
-            finalR = xVal;
-        }
-
-        SmartDashboard.putNumber("FinalR", finalR);
-        SmartDashboard.putNumber("FinalL", finalL);
-
-        // Sending values to motor(0), motor(1)
-        motors[0].set(ControlMode.PercentOutput, finalR);
-        motors[1].set(ControlMode.PercentOutput, finalR);
-        motors[2].set(ControlMode.PercentOutput, finalL);
-        motors[3].set(ControlMode.PercentOutput, finalL);
     }
 }
