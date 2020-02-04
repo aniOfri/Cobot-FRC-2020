@@ -68,25 +68,7 @@ public class Robot extends TimedRobot {
     // Movement
     drive.movement();
 
-    if(stick.getRawButton(3)){
-      climb[0].set(ControlMode.PercentOutput, 0.5);//right motor
-      climb[1].set(ControlMode.PercentOutput, -0.5);//left motor
-    }
-    else if(stick.getRawButton(5)){
-      climb[0].set(ControlMode.PercentOutput, -0.5);
-      climb[1].set(ControlMode.PercentOutput, 0.5);
-    }
-    else{
-      climb[0].set(ControlMode.PercentOutput, 0);
-      climb[1].set(ControlMode.PercentOutput, 0);
-    }
 
-    if(stick.getRawButton(4))
-      balance.set(1);
-    else if(stick.getRawButton(6))
-      balance.set(-1);
-    else
-      balance.set(0);
 
     // SmartDashboard
     SmartDashboard.putBoolean("Trigger: ", stick.getTrigger());
