@@ -4,6 +4,7 @@ package frc.robot.subsystem;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,11 +15,12 @@ public class climbingSubsystem extends SubsystemBase {
     TalonSRX right_motor;
     TalonSRX left_motor;
     VictorSP balance;
-
+    Ultrasonic dis_L;
     Joystick stick;
 
     public climbingSubsystem() {
         // Initialize motors
+        dis_L=new Ultrasonic(1,2);//echo 2
         right_motor = new TalonSRX(5);
         left_motor = new TalonSRX(4);
 
@@ -30,7 +32,8 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     public void manualClimbing(){
-        SmartDashboard.putString("hEllo"," asdads");
+        SmartDashboard.putNumber("distance",dis_L.getRangeInches());
+
         if(stick.getRawButton(3)){
             right_motor.set(ControlMode.PercentOutput, 0.5);//right motor
             left_motor.set(ControlMode.PercentOutput, -0.5);//left motor
@@ -50,6 +53,10 @@ public class climbingSubsystem extends SubsystemBase {
             balance.set(-1);
         else
             balance.set(0);
+    }
+
+    public void autonomousClimbing(){
+
     }
 
 }

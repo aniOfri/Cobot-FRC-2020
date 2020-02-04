@@ -3,18 +3,19 @@ package frc.robot.subsystem;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class drivingSubsystem extends SubsystemBase {
+public class drivingSubsystem extends SubsystemBase{
 
     // Declaration
     VictorSPX left_front;
     VictorSPX left_rear;
     VictorSPX right_front;
     VictorSPX right_rear;
-
+    Encoder encoder;
     Joystick stick;
 
     public drivingSubsystem() {
