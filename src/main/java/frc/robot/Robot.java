@@ -12,12 +12,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
+import frc.robot.subsystem.shootingSubsystem;
 
 public class Robot extends TimedRobot {
   Joystick stick;
-  //VictorSPX[] shooter;
   drivingSubsystem drive;
   climbingSubsystem climb;
+  shootingSubsystem shoot;
 
 
   @Override
@@ -28,13 +29,7 @@ public class Robot extends TimedRobot {
     // Initialize subsystems
     drive = new drivingSubsystem();
     climb = new climbingSubsystem();
-
-    /* 
-    //Initialize shooter as a two-item array 
-    shooter = new VictorSP[2];
-    // Initialization
-    shooter[0] = new VictorSP(5);
-    shooter[1] = new VictorSP(6);*/
+    shoot = new shootingSubsystem();
     }
 
   @Override
@@ -45,16 +40,7 @@ public class Robot extends TimedRobot {
     // Climbing
     climb.manualClimbing();
 
-    /*
-    // If trigger is pressed
-    if (stick.getTrigger()){
-      shooter[0].set(1);
-      shooter[1].set(1);
-    }
-    // Else, set the motors to 0
-    else{
-      shooter[0].set(0);
-      shooter[1].set(0);
-    }*/
+    // Shooting
+    shoot.shooter();
     }
 }
