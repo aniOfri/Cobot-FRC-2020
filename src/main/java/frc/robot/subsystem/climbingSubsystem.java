@@ -16,15 +16,15 @@ public class climbingSubsystem extends SubsystemBase {
     TalonSRX left_motor;
     VictorSP balance;
 
-    Ultrasonic dis_L;
-    Ultrasonic dis_R;
+    Ultrasonic high_L;
+    Ultrasonic high_R;
 
     Joystick stick;
 
     public climbingSubsystem() {
         // Initialize Ultrasonic sensors
-        dis_L=new Ultrasonic(1,2);//echo 2
-        dis_R=new Ultrasonic(3,4);//echo 2
+        high_L=new Ultrasonic(1,2);//echo 2
+        high_R=new Ultrasonic(3,4);//echo 2
 
         // Initialize motors
         right_motor = new TalonSRX(5);
@@ -37,7 +37,7 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     public void manualClimbing(){
-        SmartDashboard.putNumber("distance",dis_L.getRangeInches());
+        SmartDashboard.putNumber("distance",high_L.getRangeInches());
 
         if(stick.getRawButton(3))
             spin(1); // Clockwise
@@ -55,7 +55,14 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     public void autonomousClimbing(){
-
+        if (high_L.getRangeMM() <= 200 ||
+            high_R.getRangeMM() <= 200)
+            spin(1); // Clockwise
+        else if (high_L.getRangeMM() >= 400 ||
+                high_R.getRangeMM() >= 400)
+            spin(-1); // Counter Clockwise
+        else
+            spin(0);
     }
 
     private void spin(int mode){
