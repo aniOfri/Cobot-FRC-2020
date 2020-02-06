@@ -9,27 +9,28 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class drivingSubsystem extends SubsystemBase{
 
-    // Declaration
+    // Wheels - גלגלים
     VictorSPX left_front;
     VictorSPX left_rear;
     VictorSPX right_front;
     VictorSPX right_rear;
 
+    // Joystick - ג'ויסטיק
     Joystick stick;
 
     public drivingSubsystem() {
-        // Initialize motors
+        // Initialize wheels - גלגלים
         left_front=new VictorSPX(3);
         left_rear=new VictorSPX(2);
         right_front=new VictorSPX(0);
         right_rear=new VictorSPX(1);
 
-        // Initialize joystick
+        // Initialize joystick - ג'ויסטיק
         stick = new Joystick(0);
     }
 
     public void movement() {
-        // Declare variables
+        // Declare variables - משתנים חדשים
         double maxLim,
                 sqrt,
                 xVal,
@@ -37,7 +38,7 @@ public class drivingSubsystem extends SubsystemBase{
                 finalL = 0,
                 finalR = 0;
 
-        // Get Joystick's input
+        // Get Joystick's input - קבל את הקלטים מהג'ויסטיק
         xVal = stick.getX();
         yVal = -stick.getY();
 
