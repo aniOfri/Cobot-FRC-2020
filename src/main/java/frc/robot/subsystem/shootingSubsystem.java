@@ -11,45 +11,45 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class shootingSubsystem extends SubsystemBase {
 
-    // Shooting motors - מנועי ירייה
+    // Shooting motors
     TalonSRX right_shooter;
     TalonSRX left_shooter;
 
-    // Siding and lifting - צידוד והרמה
+    // Siding and lifting
     VictorSP siding;
     //TalonSRX lifting;
 
-    // Siding and lifting value - ערכים של צידוד והרמה
+    // Siding and lifting value
     double cX;
     double cY;
 
-    // Ball Slotting - שמירת כדורים
+    // Ball Slotting
     //TalonSRX slots[];
 
-    // Limit Switch - מפסק גבול
+    // Limit Switch
     //DigitalInput[] sensors;
 
-    // Joystick - ג'ויסטיק
+    // Joystick
     Joystick stick;
 
     public shootingSubsystem() {
-    // Initialize shooters - מנועים של ירייה
+    // Initialize shooters
     right_shooter = new TalonSRX(6);
     left_shooter = new TalonSRX(7);
 
-    // Initialize siding and lifting - מנועים של צידוד והרמה
+    // Initialize siding and lifting
     siding = new VictorSP(0);
     //lifting = new TalonSRX(9);
 
     /*
-    // Initialize slot motors - מנועים של שמירת כדורים
+    // Initialize slot motors
     slots = new TalonSRX[4];
     slots[0] = new TalonSRX(10);
     slots[1] = new TalonSRX(11);
     slots[2] = new TalonSRX(12);
     slots[3] = new TalonSRX(13);
 
-    // Initialize sensors - חיישנים
+    // Initialize sensors
     sensors = new DigitalInput[5];
     sensors[0] = new DigitalInput(0);
     sensors[1] = new DigitalInput(1);
@@ -62,10 +62,10 @@ public class shootingSubsystem extends SubsystemBase {
     }
 
     public void shooting(){
-        // Manual shooting - קריאה לירייה ידנית
+        // Manual shooting
         manualShooting();
 
-        // Siding and lifting - צידוד והרמה
+        // Siding and lifting
         sidingAndLifting();
     }
 
@@ -83,8 +83,7 @@ public class shootingSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("cX: ", cX);
     }
 
-    /* Set motor on 1 or 0, Depending on the mode value
-       הפעל מנוע על 0 או 1 לפי ה-mode */
+    /* Set motor on 1 or 0, Depending on the mode value*/
     private void spin(int mode){
         right_shooter.set(ControlMode.PercentOutput, mode);
         left_shooter.set(ControlMode.PercentOutput, mode);

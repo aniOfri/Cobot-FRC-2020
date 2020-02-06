@@ -11,43 +11,43 @@ import edu.wpi.first.wpilibj.VictorSP;
 
 public class climbingSubsystem extends SubsystemBase {
 
-    // Climbing motors & balancing - מנועי טיפוס ואיזון
+    // Climbing motors & balancing
     TalonSRX right_motor;
     TalonSRX left_motor;
     VictorSP balance;
 
-    // Ultrasonic - אולטרסוני
+    // Ultrasonic
     Ultrasonic high_L;
     Ultrasonic high_R;
 
-    // Joystick - ג'ויסטיק
+    // Joystick
     Joystick stick;
 
-    // autoBalance toggle - מפסק איזון אוטומטי
+    // autoBalance toggle
     boolean autoBalance;
 
     public climbingSubsystem() {
-        // Initialize Ultrasonic sensors - חיישנים אולטרסוני
+        // Initialize Ultrasonic sensors
         high_L=new Ultrasonic(1,2);//echo 2
         high_R=new Ultrasonic(3,4);//echo 2
 
-        // Initialize climbing motors & balancing - מנועי טיפוס ואיזון
+        // Initialize climbing motors & balancing
         right_motor = new TalonSRX(5);
         left_motor = new TalonSRX(4);
         balance = new VictorSP(0);
 
-        // Initialize joystick - ג'ויסטיק
+        // Initialize joystick
         stick = new Joystick(0);
 
-        // Initialize autonomous toggle - מפסק איזון אוטומטי
+        // Initialize autonomous toggle
         autoBalance = false;
     }
 
     public void climbing(){
-        // Manual climbing - קריאה לטיפוס ידני
+        // Manual climbing
         manualClimbing();
 
-        // Autonomous balancing - אם מפסק חיובי קרא לטיפוס אוטומטי
+        // Autonomous balancing
         if (autoBalance)
             autonomousBalance();
     }
@@ -56,21 +56,21 @@ public class climbingSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("distance (L)",high_L.getRangeMM());
         SmartDashboard.putNumber("distance (R)",high_R.getRangeMM());
 
-        // Toggle auto-balancing - שינוי מפסק איזון
+        // Toggle auto-balancing
         if (stick.getTop() && !autoBalance)
             autoBalance = true;
         else if (stick.getTop() && autoBalance)
             autoBalance = false;
 
-        // Spin motor - הפעלת מנוע
+        // Spin motor
         if(stick.getRawButton(3))
-            spin(1); // Clockwise -
+            spin(1); // Clockwise
         else if(stick.getRawButton(5))
             spin(-1); // Counter Clockwise
         else
             spin(0); // Neutral mode
 
-        // Balancing motor - מנוע איזון
+        // Balancing motor
         if(stick.getRawButton(4))
             balance.set(1); // Right
         else if(stick.getRawButton(6))
@@ -80,22 +80,19 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     public void autonomousBalance(){
-        /* If sensor detects range less than 200 on either side
-         אם החיישן מזהה מרחק קטן מ200 בכל צד */
+        /* If sensor detects range less than 200 on either side*/
         if (high_L.getRangeMM() <= 200 ||
             high_R.getRangeMM() <= 200)
-            spin(1); // Clockwise - כיוון השעון
-        /* If sensor detects range greater than 400 on either side
-         אם החיישן מזהה מרחק גדול מ400 בכל צד */
+            spin(1); // Clockwise
+        /* If sensor detects range greater than 400 on either side*/
         else if (high_L.getRangeMM() >= 400 ||
                 high_R.getRangeMM() >= 400)
-            spin(-1); // Counter Clockwise - נגד הכיוון השעון
+            spin(-1); // Counter Clockwise
         else
-            spin(0); // Set 0 - בטל מנוע
+            spin(0); // Neutral mode
     }
 
-    /* Set motor on 0.5, -0.5 or 0, Depending on the mode value
-    הפעל את המנוע על 0.5, -0.5 אם 0, לפי ה-mode */
+    /* Set motor on 0.5, -0.5 or 0, Depending on the mode value*/
     private void spin(int mode){
         right_motor.set(ControlMode.PercentOutput, mode *  0.5);
         left_motor.set(ControlMode.PercentOutput, mode * -0.5);
