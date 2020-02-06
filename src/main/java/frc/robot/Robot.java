@@ -10,6 +10,7 @@ package frc.robot;
 // Import Essentials
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.VictorSP;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 import frc.robot.subsystem.shootingSubsystem;
