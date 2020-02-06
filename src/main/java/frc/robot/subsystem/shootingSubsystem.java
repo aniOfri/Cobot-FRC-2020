@@ -3,8 +3,9 @@ package frc.robot.subsystem;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Joystick;
 
 public class shootingSubsystem extends SubsystemBase {
 
@@ -14,6 +15,8 @@ public class shootingSubsystem extends SubsystemBase {
 
     TalonSRX siding;
     TalonSRX lifting;
+
+    DigitalInput[] sensors;
 
     Joystick stick;
 
@@ -25,6 +28,14 @@ public class shootingSubsystem extends SubsystemBase {
     // Initialize siding and lifting
     siding = new TalonSRX(8);
     lifting = new TalonSRX(9);
+
+    // Initialize sensors
+    sensors = new DigitalInput[5];
+    sensors[0] = new DigitalInput(0);
+    sensors[1] = new DigitalInput(1);
+    sensors[2] = new DigitalInput(2);
+    sensors[3] = new DigitalInput(3);
+    sensors[4] = new DigitalInput(4);
 
     // Initialize joystick
     stick = new Joystick(0);
