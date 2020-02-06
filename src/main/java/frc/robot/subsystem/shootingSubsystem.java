@@ -13,6 +13,8 @@ public class shootingSubsystem extends SubsystemBase {
     TalonSRX right_shooter;
     TalonSRX left_shooter;
 
+    TalonSRX slots[];
+
     TalonSRX siding;
     TalonSRX lifting;
 
@@ -28,6 +30,13 @@ public class shootingSubsystem extends SubsystemBase {
     // Initialize siding and lifting
     siding = new TalonSRX(8);
     lifting = new TalonSRX(9);
+
+    // Initialize slot motors
+    slots = new TalonSRX[4];
+    slots[0] = new TalonSRX(10);
+    slots[1] = new TalonSRX(11);
+    slots[2] = new TalonSRX(12);
+    slots[3] = new TalonSRX(13);
 
     // Initialize sensors
     sensors = new DigitalInput[5];
