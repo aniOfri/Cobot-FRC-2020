@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.Joystick;
 public class shootingSubsystem extends SubsystemBase {
 
     // Shooting motors
-    TalonSRX right_shooter;
-    TalonSRX left_shooter;
+    //TalonSRX right_shooter;
+    //TalonSRX left_shooter;
 
     // Siding and lifting
     VictorSP siding;
@@ -22,6 +22,8 @@ public class shootingSubsystem extends SubsystemBase {
     // Siding and lifting value
     double cX;
     double cY;
+    double imgW;
+    double imgH;
 
     // Ball Slotting
     //TalonSRX slots[];
@@ -34,8 +36,8 @@ public class shootingSubsystem extends SubsystemBase {
 
     public shootingSubsystem() {
     // Initialize shooters
-    right_shooter = new TalonSRX(6);
-    left_shooter = new TalonSRX(7);
+    //right_shooter = new TalonSRX(6);
+    //left_shooter = new TalonSRX(7);
 
     // Initialize siding and lifting
     siding = new VictorSP(0);
@@ -57,13 +59,13 @@ public class shootingSubsystem extends SubsystemBase {
     sensors[3] = new DigitalInput(3);
     sensors[4] = new DigitalInput(4);*/
 
-    // Initialize joystick - ג'ויסטיק
+    // Initialize joystick
     stick = new Joystick(0);
     }
 
     public void shooting(){
         // Manual shooting
-        manualShooting();
+        //manualShooting();
 
         // Siding and lifting
         sidingAndLifting();
@@ -79,14 +81,23 @@ public class shootingSubsystem extends SubsystemBase {
     }
 
     private void sidingAndLifting(){
-        cX = SmartDashboard.getNumber("cX", 0);
-        SmartDashboard.putNumber("cX: ", cX);
+        if (SmartDashboard.getBoolean("found", false)){
+            cX = SmartDashboard.getNumber("cX", 0);
+            imgW = SmartDashboard.getNumber("imgW", 1);
+            if (cX < imgW/2 - imgW/2*0.1 ||
+                cX > imgW/2 + imgW/2*0.1)
+                siding.set(0.8 * (imgW/2 - cX) / imgW);
+            else
+                siding.set(0);
+        }
+        else
+            siding.set(0);
     }
 
     /* Set motor on 1 or 0, Depending on the mode value*/
     private void spin(int mode){
-        right_shooter.set(ControlMode.PercentOutput, mode);
-        left_shooter.set(ControlMode.PercentOutput, mode);
+        //right_shooter.set(ControlMode.PercentOutput, mode);
+        //left_shooter.set(ControlMode.PercentOutput, mode);
     }
 
 }

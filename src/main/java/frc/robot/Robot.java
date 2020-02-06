@@ -18,9 +18,10 @@ import frc.robot.subsystem.shootingSubsystem;
 public class Robot extends TimedRobot {
 
   Joystick stick;
-  drivingSubsystem drive;
-  climbingSubsystem climb;
+  //drivingSubsystem drive;
+  //climbingSubsystem climb;
   shootingSubsystem shoot;
+
 
   @Override
   public void robotInit() {
@@ -28,18 +29,18 @@ public class Robot extends TimedRobot {
     stick = new Joystick(0);
 
     // Initialize subsystems
-    drive = new drivingSubsystem();
-    climb = new climbingSubsystem();
+    //drive = new drivingSubsystem();
+    //climb = new climbingSubsystem();
     shoot = new shootingSubsystem();
     }
 
   @Override
   public void robotPeriodic() {
     // Movement
-    drive.movement();
+    //drive.movement();
 
     // Climbing
-    climb.climbing();
+    //climb.climbing();
 
     // Shooting
     shoot.shooting();
