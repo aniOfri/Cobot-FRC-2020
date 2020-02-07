@@ -1,6 +1,7 @@
 package frc.robot.subsystem;
 
 
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -22,8 +23,8 @@ public class shootingSubsystem extends SubsystemBase {
     // Siding and lifting value
     double cX;
     double cY;
-    double imgW;
-    double imgH;
+    double imgWidCenter;
+    double imgHiCenter;
 
     // Ball Slotting
     //TalonSRX slots[];
@@ -83,12 +84,21 @@ public class shootingSubsystem extends SubsystemBase {
     private void sidingAndLifting(){
         if (SmartDashboard.getBoolean("found", false)){
             cX = SmartDashboard.getNumber("cX", 0);
-            imgW = SmartDashboard.getNumber("imgW", 1);
-            if (cX < imgW/2 - imgW/2*0.1 ||
-                cX > imgW/2 + imgW/2*0.1)
-                siding.set(0.8 * (imgW/2 - cX) / imgW);
+            //cY = SmartDashboard.getNumber("cY", 0);
+            imgWidCenter = SmartDashboard.getNumber("imgW", 1) / 2;
+            //imgHiCenter = SmartDashboard.getNumber("imgH", 1) / 2;
+
+            // Siding
+            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1)
+                siding.set(0.8 * (imgWidCenter - cX) / imgWidCenter*2);
             else
                 siding.set(0);
+
+            // Lifting
+            /*if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1)
+                lifting.set(0.8 * (imgHiCenter - cY) / imgHiCenter*2);
+            else
+                lifting.set(0);*/
         }
         else
             siding.set(0);
