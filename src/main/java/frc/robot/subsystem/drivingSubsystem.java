@@ -22,8 +22,8 @@ public class drivingSubsystem extends SubsystemBase{
         // Initialize wheels
         left_front=new VictorSPX(3);
         left_rear=new VictorSPX(2);
-        right_front=new VictorSPX(0);
-        right_rear=new VictorSPX(1);
+        right_front=new VictorSPX(1);
+        right_rear=new VictorSPX(0);
 
         // Initialize joystick
         stick = new Joystick(0);
@@ -63,6 +63,7 @@ public class drivingSubsystem extends SubsystemBase{
         // Sending values to motors
         right_front.set(ControlMode.PercentOutput, finalR);
         right_rear.set(ControlMode.PercentOutput, finalR);
+
         left_front.set(ControlMode.PercentOutput, finalL);
         left_rear.set(ControlMode.PercentOutput, finalL);
     }
