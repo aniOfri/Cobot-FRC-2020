@@ -1,6 +1,7 @@
 package frc.robot.subsystem;
 
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -20,6 +21,10 @@ public class climbingSubsystem extends SubsystemBase {
     Ultrasonic high_L;
     Ultrasonic high_R;
 
+    // LimitSwitch
+    DigitalInput left;
+    DigitalInput right;
+
     // Joystick
     Joystick stick;
 
@@ -38,6 +43,10 @@ public class climbingSubsystem extends SubsystemBase {
 
         // Initialize joystick
         stick = new Joystick(0);
+
+        // Initialize LimitSwitch
+        left = new DigitalInput(3); // Balance (Left)
+        right = new DigitalInput(4); // Balance (Right)
 
         // Initialize autonomous toggle
         autoBalance = false;

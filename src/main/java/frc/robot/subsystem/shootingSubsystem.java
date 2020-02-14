@@ -15,14 +15,15 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Siding and lifting
     TalonSRX siding;
-    //TalonSRX lifting;
+    TalonSRX lifting;
 
     // Siding and lifting value
-    Encoder liftingVal;
     double cX;
     double cY;
     double imgWidCenter;
     double imgHiCenter;
+    double outputX;
+    double outputY;
 
     // Ball Slotting
     VictorSP slots[];
@@ -43,7 +44,7 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Initialize siding and lifting
     siding = new TalonSRX(5);
-    //lifting = new TalonSRX(4);
+    lifting = new TalonSRX(4);
 
 
     /*// Initialize slot motors
@@ -61,13 +62,11 @@ public class shootingSubsystem extends SubsystemBase {
     sensors[3] = new Ultrasonic(3,3);*/
 
     // Initialize Limit Switch
-    lmtSwitch = new DigitalInput[6];
+    lmtSwitch = new DigitalInput[4];
     lmtSwitch[0] = new DigitalInput(1); // Lifting (Min)
     lmtSwitch[1] = new DigitalInput(2); // Lifting (Max)
-    lmtSwitch[2] = new DigitalInput(3); // Balance (Left)
-    lmtSwitch[3] = new DigitalInput(4); // Balance (Right)
-    lmtSwitch[4] = new DigitalInput(5); // Siding (Right)
-    lmtSwitch[5] = new DigitalInput(6); // Siding (Left)
+    lmtSwitch[2] = new DigitalInput(5); // Siding (Right)
+    lmtSwitch[3] = new DigitalInput(6); // Siding (Left)
 
     // Initialize joystick
     stick = new Joystick(0);
@@ -85,12 +84,39 @@ public class shootingSubsystem extends SubsystemBase {
     }
 
     private void manualShooting(){
-        /*// If trigger is pressed
-        if (stick.getTrigger())
-            siding.set(ControlMode.PercentOutput, stick.getX());
-        // Else, set the motors to 0
-        else
-            siding.set(ControlMode.PercentOutput, 0)*/
+        // If trigger is pressed
+        if (stick.getTrigger()) {
+            if (!lmtSwitch[2].get())
+                if (stick.getX() < 0)
+                    siding.set(ControlMode.PercentOutput, 0.2 * stick.getX());
+                else
+                    siding.set(ControlMode.PercentOutput, 0);
+            else if (!lmtSwitch[3].get())
+                if (stick.getX() > 0)
+                    siding.set(ControlMode.PercentOutput, 0.2 * stick.getX());
+                else
+                    siding.set(ControlMode.PercentOutput, 0);
+            else
+                siding.set(ControlMode.PercentOutput, 0.2 * stick.getX());
+
+            if (!lmtSwitch[0].get())
+                if (-stick.getY() > 0)
+                    lifting.set(ControlMode.PercentOutput, 0.3 * stick.getY());
+                else
+                    lifting.set(ControlMode.PercentOutput, 0);
+            else if (!lmtSwitch[1].get())
+                if (-stick.getY() < 0)
+                    lifting.set(ControlMode.PercentOutput, 0.3 * stick.getY());
+                else
+                    lifting.set(ControlMode.PercentOutput, 0);
+            else
+                lifting.set(ControlMode.PercentOutput, 0.3 * stick.getY());
+            // Else, set the motors to 0
+        }
+        else {
+            siding.set(ControlMode.PercentOutput, 0);
+            lifting.set(ControlMode.PercentOutput, 0);
+        }
 
         for(int i = 0; i < 6; i++)
             SmartDashboard.putBoolean("lmtSwitch["+i+"]", lmtSwitch[i].get());
@@ -99,27 +125,36 @@ public class shootingSubsystem extends SubsystemBase {
     private void sidingAndLifting(){
         if (SmartDashboard.getBoolean("found", false)){
             cX = SmartDashboard.getNumber("cX", 0);
-            //cY = SmartDashboard.getNumber("cY", 0);
+            cY = SmartDashboard.getNumber("cY", 0);
             imgWidCenter = SmartDashboard.getNumber("imgW", 1) / 2;
-            //imgHiCenter = SmartDashboard.getNumber("imgH", 1) / 2;
+            imgHiCenter = SmartDashboard.getNumber("imgH", 1) / 2;
+
+            outputX = 0.6 * (imgWidCenter - cX) / imgWidCenter*2;
+            outputY = 0.6 * (imgHiCenter - cY) / imgHiCenter*2;
 
             // Siding
-            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1)
-                siding.set(ControlMode.PercentOutput, 0.6 *
-                        (imgWidCenter - cX) / imgWidCenter*2);
+            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1){
+                if (lmtSwitch[2].get() || lmtSwitch[3].get())
+                    outputX *= -1;
+                siding.set(ControlMode.PercentOutput, outputX);
+            }
             else
                 siding.set(ControlMode.PercentOutput, 0);
 
-            /*// Lifting
-            if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1)
+
+            // Lifting
+            if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1){
+                if (lmtSwitch[0].get() || lmtSwitch[1].get())
+                    outputY *= -1;
                 lifting.set(ControlMode.PercentOutput, 0.8 *
                         (imgHiCenter - cY) / imgHiCenter*2);
+            }
             else
-                lifting.set(ControlMode.PercentOutput, 0);*/
+                lifting.set(ControlMode.PercentOutput, 0);
         }
         else
             siding.set(ControlMode.PercentOutput, 0);
-            //lifting.set(ControlMode.PercentOutput, 0);
+            lifting.set(ControlMode.PercentOutput, 0);
     }
 
     private void reloading(){
