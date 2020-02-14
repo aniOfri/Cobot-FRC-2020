@@ -118,8 +118,8 @@ public class shootingSubsystem extends SubsystemBase {
             lifting.set(ControlMode.PercentOutput, 0);
         }
 
-        for(int i = 0; i < 6; i++)
-            SmartDashboard.putBoolean("lmtSwitch["+i+"]", lmtSwitch[i].get());
+        for(int i = 0; i < 4; i++)
+            SmartDashboard.putBoolean("lmtSwitch["+i+"]", !lmtSwitch[i].get());
     }
 
     private void sidingAndLifting(){

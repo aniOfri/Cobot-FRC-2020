@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
 
   Joystick stick;
   //drivingSubsystem drive;
-  //climbingSubsystem climb;
+  climbingSubsystem climb;
   shootingSubsystem shoot;
 
 
@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
 
     // Initialize subsystems
     //drive = new drivingSubsystem();
-    //climb = new climbingSubsystem();
+    climb = new climbingSubsystem();
     shoot = new shootingSubsystem();
     }
 
@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
     //drive.movement();
 
     // Climbing
-    //climb.climbing();
+    climb.climbing();
 
     // Shooting
     shoot.shooting();

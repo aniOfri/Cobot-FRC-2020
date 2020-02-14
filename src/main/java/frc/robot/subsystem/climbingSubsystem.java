@@ -32,14 +32,14 @@ public class climbingSubsystem extends SubsystemBase {
     boolean autoBalance;
 
     public climbingSubsystem() {
-        // Initialize Ultrasonic sensors
+        /*// Initialize Ultrasonic sensors
         high_L=new Ultrasonic(1,2);//echo 2
         high_R=new Ultrasonic(3,4);//echo 2
 
         // Initialize climbing motors & balancing
         right_motor = new TalonSRX(5);
-        left_motor = new TalonSRX(4);
-        balance = new VictorSP(0);
+        left_motor = new TalonSRX(4);*/
+        balance = new VictorSP(4);
 
         // Initialize joystick
         stick = new Joystick(0);
@@ -62,27 +62,29 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     private void manualClimbing(){
-        SmartDashboard.putNumber("distance (L)",high_L.getRangeMM());
-        SmartDashboard.putNumber("distance (R)",high_R.getRangeMM());
+        //SmartDashboard.putNumber("distance (L)",high_L.getRangeMM());
+        //SmartDashboard.putNumber("distance (R)",high_R.getRangeMM());
+        SmartDashboard.putBoolean("left", !left.get());
+        SmartDashboard.putBoolean("right", !right.get());
 
-        // Toggle auto-balancing
+        /*// Toggle auto-balancing
         if (stick.getTop() && !autoBalance)
             autoBalance = true;
         else if (stick.getTop() && autoBalance)
-            autoBalance = false;
+            autoBalance = false;*/
 
-        // Spin motor
+        /*// Spin motor
         if(stick.getRawButton(3))
             spin(1); // Clockwise
         else if(stick.getRawButton(5))
             spin(-1); // Counter Clockwise
         else
-            spin(0); // Neutral mode
+            spin(0); // Neutral mode*/
 
         // Balancing motor
-        if(stick.getRawButton(4))
+        if(stick.getRawButton(4) && right.get())
             balance.set(1); // Right
-        else if(stick.getRawButton(6))
+        else if(stick.getRawButton(6) && left.get())
             balance.set(-1); // Left
         else
             balance.set(0); // None
