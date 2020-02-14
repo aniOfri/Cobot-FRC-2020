@@ -1,11 +1,8 @@
 package frc.robot.subsystem;
 
 
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -32,6 +29,9 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Ultrasonics
     Ultrasonic[] sensors;
+
+    // LimitSwitch
+    DigitalInput[] lmtSwitch;
 
     // Joystick
     Joystick stick;
@@ -60,6 +60,15 @@ public class shootingSubsystem extends SubsystemBase {
     sensors[2] = new Ultrasonic(2,2);
     sensors[3] = new Ultrasonic(3,3);*/
 
+    // Initialize Limit Switch
+    lmtSwitch = new DigitalInput[6];
+    lmtSwitch[0] = new DigitalInput(1); // Lifting (Min)
+    lmtSwitch[1] = new DigitalInput(2); // Lifting (Max)
+    lmtSwitch[2] = new DigitalInput(3); // Balance (Left)
+    lmtSwitch[3] = new DigitalInput(4); // Balance (Right)
+    lmtSwitch[4] = new DigitalInput(5); // Siding (Right)
+    lmtSwitch[5] = new DigitalInput(6); // Siding (Left)
+
     // Initialize joystick
     stick = new Joystick(0);
     }
@@ -76,12 +85,15 @@ public class shootingSubsystem extends SubsystemBase {
     }
 
     private void manualShooting(){
-        // If trigger is pressed
+        /*// If trigger is pressed
         if (stick.getTrigger())
             siding.set(ControlMode.PercentOutput, stick.getX());
         // Else, set the motors to 0
         else
-            siding.set(ControlMode.PercentOutput, 0);
+            siding.set(ControlMode.PercentOutput, 0)*/
+
+        for(int i = 0; i < 6; i++)
+            SmartDashboard.putBoolean("lmtSwitch["+i+"]", lmtSwitch[i].get());
     }
 
     private void sidingAndLifting(){
