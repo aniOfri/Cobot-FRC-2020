@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class climbingSubsystem extends SubsystemBase {
 
     // Climbing motors & balancing
-    TalonSRX right_motor;
-    TalonSRX left_motor;
+    TalonSRX right_motor,
+             left_motor;
     VictorSP balance;
 
     // Ultrasonic
