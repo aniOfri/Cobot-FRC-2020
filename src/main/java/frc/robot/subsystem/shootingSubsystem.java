@@ -110,14 +110,15 @@ public class shootingSubsystem extends SubsystemBase {
         outputX = 0;
         outputY = 0;
 
-        // Siding
+        // Manual siding and lifting movement
+            // Siding
         if (!lmtSwitch[2].get() && stick.getX() < 0)
                 outputX = 0.3 * stick.getX();
         else if (!lmtSwitch[3].get() && stick.getX() > 0)
                 outputX = 0.3 * stick.getX();
         else outputX = 0.3 * stick.getX();
 
-        // Lifting
+            // Lifting
         if (!lmtSwitch[0].get() && -stick.getY() > 0)
                 outputY = 0.3 * stick.getY();
         else if (!lmtSwitch[1].get() && -stick.getY() < 0)
@@ -140,22 +141,22 @@ public class shootingSubsystem extends SubsystemBase {
             imgWidCenter = SmartDashboard.getNumber("imgW", 1) / 2;
             imgHiCenter = SmartDashboard.getNumber("imgH", 1) / 2;
 
+            // Default value
+            outputX = 0;
+            outputY = 0;
+
             // Set output value depending on the goal's location
-            outputX = 0.6 * (imgWidCenter - cX) / imgWidCenter*2;
-            outputY = 0.6 * (imgHiCenter - cY) / imgHiCenter*2;
+                // Siding
+            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1 &&
+                !(lmtSwitch[0].get() && lmtSwitch[1].get()))
+                outputX = 0.6 * (imgWidCenter - cX) / imgWidCenter*2;
+                // Lifting
+            if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1 &&
+                !(lmtSwitch[2].get() && lmtSwitch[3].get()))
+                outputY = 0.6 * (imgHiCenter - cY) / imgHiCenter*2;
 
-            // Siding
-            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1){
-                siding.set(ControlMode.PercentOutput, outputX);
-            }
-            else
-                siding.set(ControlMode.PercentOutput, 0);
-
-            // Lifting
-            if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1)
-                lifting.set(ControlMode.PercentOutput, outputY);
-            else
-                lifting.set(ControlMode.PercentOutput, 0);
+            siding.set(ControlMode.PercentOutput, outputX);
+            lifting.set(ControlMode.PercentOutput, outputY);
         }
         // If the goal is not found
         else
