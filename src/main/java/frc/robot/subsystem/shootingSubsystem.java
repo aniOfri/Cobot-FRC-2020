@@ -12,6 +12,8 @@ public class shootingSubsystem extends SubsystemBase {
     // Shooting motors
     VictorSP right_shooter;
     VictorSP left_shooter;
+    VictorSP push;
+
 
     // Siding and lifting
     TalonSRX siding;
@@ -41,8 +43,9 @@ public class shootingSubsystem extends SubsystemBase {
 
     public shootingSubsystem() {
     // Initialize shooters
-    right_shooter = new VictorSP(4);
-    left_shooter = new VictorSP(5);
+    right_shooter = new VictorSP(0);
+    left_shooter = new VictorSP(1);
+    push = new VictorSP(2);
 
     // Initialize siding and lifting
     siding = new TalonSRX(5);
@@ -50,11 +53,12 @@ public class shootingSubsystem extends SubsystemBase {
 
 
     // Initialize slot motors
-    slots = new VictorSP[4];
-    slots[0] = new VictorSP(3);
-    slots[1] = new VictorSP(4);
-    slots[2] = new VictorSP(5);
-    slots[3] = new VictorSP(6);
+    slots = new VictorSP[3];
+    slots[0] = new VictorSP(5);
+    slots[1] = new VictorSP(6);
+    slots[2] = new VictorSP(7);
+    /*slots[3] = new VictorSP(8);
+    slots[4] = new VictorSP(9);*/
 
     /*// Initialize sensors
     sensors = new Ultrasonic[5];
@@ -79,28 +83,49 @@ public class shootingSubsystem extends SubsystemBase {
         manualShooting();
 
         // Manual siding and lifting
-        manualSidingAndLifting();
+        if (stick.getRawButton(8)){
+            manualSidingAndLifting();
+            sidingAndLifting();}
+        else{
+            siding.set(ControlMode.PercentOutput, 0);
+            lifting.set(ControlMode.PercentOutput, 0);
+        }
 
         // Siding and lifting
-        sidingAndLifting();
+        //if (stick.getTop())
+        //    sidingAndLifting();
 
         // Reloading
         reloading();
+
+        SmartDashboard.putBoolean("Lifting (Min)", !lmtSwitch[0].get());
+        SmartDashboard.putBoolean("Lifting (Max)", !lmtSwitch[1].get());
+        SmartDashboard.putBoolean("Siding (Right)", !lmtSwitch[2].get());
+        SmartDashboard.putBoolean("Siding (Left)", !lmtSwitch[3].get());
+
+        SmartDashboard.putNumber("Siding", siding.getMotorOutputPercent());
+        SmartDashboard.putNumber("Lifting", lifting.getMotorOutputPercent());
     }
 
     // Manual shooting
     private void manualShooting(){
         // If trigger is pressed
-        if (stick.getTrigger())
+        if (stick.getTop())
             spin(1);
             // Else, set the motors to 0
         else
             spin(0);
+
+        if (stick.getTrigger())
+            push.set(0.2);
+        else
+            push.set(0);
+
     }
 
     private void spin(int mode){
         right_shooter.set(mode);
-        left_shooter.set(mode);
+        left_shooter.set(-mode);
     }
 
 
@@ -117,7 +142,6 @@ public class shootingSubsystem extends SubsystemBase {
         else if (!lmtSwitch[3].get() && stick.getX() > 0)
                 outputX = 0.3 * stick.getX();
         else outputX = 0.3 * stick.getX();
-
             // Lifting
         if (!lmtSwitch[0].get() && -stick.getY() > 0)
                 outputY = 0.3 * stick.getY();
@@ -141,54 +165,68 @@ public class shootingSubsystem extends SubsystemBase {
             imgWidCenter = SmartDashboard.getNumber("imgW", 1) / 2;
             imgHiCenter = SmartDashboard.getNumber("imgH", 1) / 2;
 
-            // Default value
-            outputX = 0;
-            outputY = 0;
-
             // Set output value depending on the goal's location
                 // Siding
-            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1 &&
-                !(lmtSwitch[0].get() && lmtSwitch[1].get()))
-                outputX = 0.6 * (imgWidCenter - cX) / imgWidCenter*2;
+            if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1){
+                SmartDashboard.putBoolean("Centered?", false);
+                if((!lmtSwitch[0].get() || !lmtSwitch[1].get())){
+                    SmartDashboard.putBoolean("LimitSwitch?", true);
+                    siding.set(ControlMode.PercentOutput, 0);}
+                else{
+                    SmartDashboard.putBoolean("LimitSwitch?", false);
+                    if (cX < imgWidCenter*0.9){
+                        SmartDashboard.putString("Correct to:", "right");
+                        siding.set(ControlMode.PercentOutput, -0.8);}
+                    else if (cX > imgWidCenter*1.1){
+                        SmartDashboard.putString("Correct to:", "left");
+                        siding.set(ControlMode.PercentOutput, 0.8);}}}
+            else{
+                SmartDashboard.putBoolean("Centered?", true);
+                siding.set(ControlMode.PercentOutput, 0);}
                 // Lifting
-            if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1 &&
-                !(lmtSwitch[2].get() && lmtSwitch[3].get()))
-                outputY = 0.6 * (imgHiCenter - cY) / imgHiCenter*2;
-
-            siding.set(ControlMode.PercentOutput, outputX);
-            lifting.set(ControlMode.PercentOutput, outputY);
+            /*if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1)
+                if((!lmtSwitch[2].get() || !lmtSwitch[3].get()))
+                    outputY = 0;
+            lifting.set(ControlMode.PercentOutput, outputY);*/
         }
         // If the goal is not found
         else
             // Search for the goal
                 // If limitSwitch
-                if (lmtSwitch[0].get() || lmtSwitch[1].get())
+                if (!lmtSwitch[0].get() || !lmtSwitch[1].get())
                     wayX = !wayX;
                 
-                if (lmtSwitch[2].get() || lmtSwitch[3].get())
+                if (!lmtSwitch[2].get() || !lmtSwitch[3].get())
                     wayY = !wayY;
             // Set values
             siding.set(ControlMode.PercentOutput, outputVal(wayX));
-            lifting.set(ControlMode.PercentOutput, outputVal(wayY));
+            //lifting.set(ControlMode.PercentOutput, outputVal(wayY));
     }
 
     private double outputVal(boolean way){
         if (way)
-            return 0.6;
+            return 0.1;
         else
-            return -0.6;
+            return -0.1;
     }
 
 
     // Reloading
     private void reloading(){
+        /*// Check for every sensors if a ball is present
         for(int i = 0; i < 5; i++){
             if (detect(i, true) &&
                 detect(i, false))
                 slots[i].set(1);
             else
                 slots[i].set(0);
-        }
+        }*/
+        if(stick.getRawButton(7)){
+            for(int i = 0; i < 3; i++)
+                slots[i].set(0.6);}
+        else{
+            for(int i = 0; i < 3; i++)
+                slots[i].set(0);}
     }
 
     private boolean detect(int i, boolean mode){

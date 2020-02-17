@@ -8,9 +8,10 @@
 package frc.robot;
 
 // Import Essentials
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 import frc.robot.subsystem.shootingSubsystem;
@@ -18,10 +19,10 @@ import frc.robot.subsystem.shootingSubsystem;
 public class Robot extends TimedRobot {
 
   Joystick stick;
-  //drivingSubsystem drive;
-  climbingSubsystem climb;
+  UsbCamera usbCam;
+  drivingSubsystem drive;
+  //climbingSubsystem climb;
   shootingSubsystem shoot;
-
 
   @Override
   public void robotInit() {
@@ -29,20 +30,24 @@ public class Robot extends TimedRobot {
     stick = new Joystick(0);
 
     // Initialize subsystems
-    //drive = new drivingSubsystem();
-    climb = new climbingSubsystem();
+    drive = new drivingSubsystem();
+    //climb = new climbingSubsystem();
     shoot = new shootingSubsystem();
+
+    usbCam = CameraServer.getInstance().startAutomaticCapture();
+    usbCam.setResolution(320,240);
     }
 
   @Override
   public void robotPeriodic() {
     // Movement
-    //drive.movement();
+    if (!stick.getRawButton(8))
+      drive.movement();
 
     // Climbing
-    climb.climbing();
+    //climb.climbing();
 
     // Shooting
-    shoot.shooting();
-    }
+      shoot.shooting();
+  }
 }

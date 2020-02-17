@@ -1,21 +1,20 @@
 package frc.robot.subsystem;
 
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.VictorSP;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class climbingSubsystem extends SubsystemBase {
 
     // Climbing motors & balancing
-    TalonSRX right_motor,
-             left_motor;
+    VictorSP right_motor;
+    VictorSP left_motor;
     VictorSP balance;
+    VictorSP elevator;
 
     // Ultrasonic
     Ultrasonic high_L;
@@ -34,12 +33,13 @@ public class climbingSubsystem extends SubsystemBase {
     public climbingSubsystem() {
         /*// Initialize Ultrasonic sensors
         high_L=new Ultrasonic(1,2);//echo 2
-        high_R=new Ultrasonic(3,4);//echo 2
+        high_R=new Ultrasonic(3,4);//echo 2*/
 
         // Initialize climbing motors & balancing
-        right_motor = new TalonSRX(5);
-        left_motor = new TalonSRX(4);*/
+        right_motor = new VictorSP(8);
+        left_motor = new VictorSP(9);
         balance = new VictorSP(4);
+        elevator = new VictorSP(3);
 
         // Initialize joystick
         stick = new Joystick(0);
@@ -61,6 +61,7 @@ public class climbingSubsystem extends SubsystemBase {
             autonomousBalance();
     }
 
+    // Manual climbing
     private void manualClimbing(){
         //SmartDashboard.putNumber("distance (L)",high_L.getRangeMM());
         //SmartDashboard.putNumber("distance (R)",high_R.getRangeMM());
@@ -73,7 +74,7 @@ public class climbingSubsystem extends SubsystemBase {
         else if (stick.getTop() && autoBalance)
             autoBalance = false;*/
 
-        /*// Spin motor
+        /// Spin motor
         if(stick.getRawButton(3))
             spin(1); // Clockwise
         else if(stick.getRawButton(5))
@@ -90,6 +91,7 @@ public class climbingSubsystem extends SubsystemBase {
             balance.set(0); // None
     }
 
+    // Autonomous balancing
     public void autonomousBalance(){
         /* If sensor detects range less than 200 on either side*/
         if (high_L.getRangeMM() <= 200 ||
@@ -103,10 +105,9 @@ public class climbingSubsystem extends SubsystemBase {
             spin(0); // Neutral mode
     }
 
-    /* Set motor on 0.5, -0.5 or 0, Depending on the mode value*/
     private void spin(int mode){
-        right_motor.set(ControlMode.PercentOutput, mode *  0.5);
-        left_motor.set(ControlMode.PercentOutput, mode * -0.5);
+        right_motor.set(mode *  0.5);
+        left_motor.set(mode * -0.5);
     }
 
 }

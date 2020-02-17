@@ -39,8 +39,8 @@ public class drivingSubsystem extends SubsystemBase{
                 finalR = 0;
 
         // Get Joystick's input
-        xVal = stick.getX();
-        yVal = -stick.getY();
+        xVal = -stick.getX();
+        yVal = stick.getY();
 
         // Algorithm Beep Boop *-*
         if (yVal > 0.2 || yVal < -0.2) {
