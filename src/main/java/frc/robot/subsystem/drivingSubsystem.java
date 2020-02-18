@@ -20,10 +20,10 @@ public class drivingSubsystem extends SubsystemBase{
 
     public drivingSubsystem() {
         // Initialize wheels
-        left_front=new VictorSPX(3);
-        left_rear=new VictorSPX(2);
-        right_front=new VictorSPX(1);
         right_rear=new VictorSPX(0);
+        right_front=new VictorSPX(1);
+        left_rear=new VictorSPX(2);
+        left_front=new VictorSPX(3);
 
         // Initialize joystick
         stick = new Joystick(0);
@@ -43,7 +43,7 @@ public class drivingSubsystem extends SubsystemBase{
         yVal = stick.getY();
 
         // Algorithm Beep Boop *-*
-        if (yVal > 0.2 || yVal < -0.2) {
+        if (yVal > 0.2 || yVal < -0.2){
             int negFix = yVal < -0.2 ? -1 : 1,
                     negPos = (int) (yVal / Math.abs(yVal));
 
@@ -52,7 +52,8 @@ public class drivingSubsystem extends SubsystemBase{
 
             finalL = sqrt * maxLim * negPos;
             finalR = (sqrt + (0.8 * xVal * -negPos * negFix)) * maxLim * -negPos;
-        } else {
+        }
+        else{
             finalL = xVal;
             finalR = xVal;
         }
@@ -61,11 +62,11 @@ public class drivingSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("FinalL", finalL);
 
         // Sending values to motors
-        right_front.set(ControlMode.PercentOutput, finalR);
-        right_rear.set(ControlMode.PercentOutput, finalR);
+        right_front.set(ControlMode.PercentOutput, finalR/2);
+        right_rear.set(ControlMode.PercentOutput, finalR/2);
 
-        left_front.set(ControlMode.PercentOutput, finalL);
-        left_rear.set(ControlMode.PercentOutput, finalL);
+        left_front.set(ControlMode.PercentOutput, finalL/2);
+        left_rear.set(ControlMode.PercentOutput, finalL/2);
     }
 }
 

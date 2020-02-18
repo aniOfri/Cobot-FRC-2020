@@ -69,10 +69,8 @@ public class climbingSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("right", !right.get());
 
         /*// Toggle auto-balancing
-        if (stick.getTop() && !autoBalance)
-            autoBalance = true;
-        else if (stick.getTop() && autoBalance)
-            autoBalance = false;*/
+        if (stick.getRawButton(11)
+            autoBalance = !autoBalance;*/
 
         /// Spin motor
         if(stick.getRawButton(3))

@@ -50,23 +50,41 @@ DigitalInput [name] = new DigitalInput(5); # Siding (Right)
 DigitalInput [name] = new DigitalInput(6); # Siding (Left)
  */
 
+// Joystick buttons' purposes
+/*
+  > .getY() - Driving / Manual Siding
+  > .getX() - Driving / Manual Lifting
+
+  > .getTop() - Shooting
+  > .getTrigger - Pushing
+
+  > .getRawButton(7) - Reloading
+  > .getRawButton(8) - Manual Siding-Lifting/Driving toggle
+
+  > .getRawButton(3) - Climbing Motors (Clockwise)
+  > .getRawButton(5) - Climbing Motors (Counter-Clockwise)
+
+  > .getRawButton(4) - Balancing (Right)
+  > .getRawButton(6) - Balancing (Left)
+ */
+
 package frc.robot;
 
 // Import Essentials
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 import frc.robot.subsystem.shootingSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
   Joystick stick;
   UsbCamera usbCam;
   drivingSubsystem drive;
-  //climbingSubsystem climb;
+  climbingSubsystem climb;
   shootingSubsystem shoot;
 
 
@@ -77,7 +95,7 @@ public class Robot extends TimedRobot {
 
     // Initialize subsystems
     drive = new drivingSubsystem();
-    //climb = new climbingSubsystem();
+    climb = new climbingSubsystem();
     shoot = new shootingSubsystem();
 
     usbCam = CameraServer.getInstance().startAutomaticCapture();
@@ -94,6 +112,6 @@ public class Robot extends TimedRobot {
     //climb.climbing();
 
     // Shooting
-      shoot.shooting();
+    shoot.shooting();
   }
 }
