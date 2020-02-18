@@ -14,7 +14,6 @@ public class shootingSubsystem extends SubsystemBase {
     VictorSP left_shooter;
     VictorSP push;
 
-
     // Siding and lifting
     TalonSRX siding;
     TalonSRX lifting;
@@ -38,6 +37,9 @@ public class shootingSubsystem extends SubsystemBase {
     // LimitSwitch
     DigitalInput[] lmtSwitch;
 
+    // Manual Toggler
+    boolean manual;
+
     // Joystick
     Joystick stick;
 
@@ -54,11 +56,9 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Initialize slot motors
     slots = new VictorSP[3];
-    slots[0] = new VictorSP(5);
-    slots[1] = new VictorSP(6);
-    slots[2] = new VictorSP(7);
-    /*slots[3] = new VictorSP(8);
-    slots[4] = new VictorSP(9);*/
+    slots[0] = new VictorSP(5); // Bottom slot motor
+    slots[1] = new VictorSP(6); // Mid slot motor
+    slots[2] = new VictorSP(7); // Top slot motor(s)
 
     /*// Initialize sensors
     sensors = new Ultrasonic[5];
@@ -69,10 +69,13 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Initialize Limit Switch
     lmtSwitch = new DigitalInput[4];
-    lmtSwitch[0] = new DigitalInput(1); // Lifting (Min)
-    lmtSwitch[1] = new DigitalInput(2); // Lifting (Max)
+    lmtSwitch[0] = new DigitalInput(1); // Lifting (Bottom)
+    lmtSwitch[1] = new DigitalInput(2); // Lifting (Top)
     lmtSwitch[2] = new DigitalInput(5); // Siding (Right)
     lmtSwitch[3] = new DigitalInput(6); // Siding (Left)
+
+    // Toggler
+    manual = false;
 
     // Initialize joystick
     stick = new Joystick(0);
@@ -83,7 +86,7 @@ public class shootingSubsystem extends SubsystemBase {
         manualShooting();
 
         // Manual siding and lifting
-        if (stick.getRawButton(8)){
+        if (manual){
             manualSidingAndLifting();
             sidingAndLifting();}
         else{
@@ -169,23 +172,23 @@ public class shootingSubsystem extends SubsystemBase {
                 // Siding
             if (cX < imgWidCenter*0.9 || cX > imgWidCenter*1.1){
                 SmartDashboard.putBoolean("Centered?", false);
-                if((!lmtSwitch[0].get() || !lmtSwitch[1].get())){
+                if((!lmtSwitch[2].get() || !lmtSwitch[3].get())){
                     SmartDashboard.putBoolean("LimitSwitch?", true);
                     siding.set(ControlMode.PercentOutput, 0);}
                 else{
                     SmartDashboard.putBoolean("LimitSwitch?", false);
                     if (cX < imgWidCenter*0.9){
                         SmartDashboard.putString("Correct to:", "right");
-                        siding.set(ControlMode.PercentOutput, -0.8);}
+                        siding.set(ControlMode.PercentOutput, -0.3);}
                     else if (cX > imgWidCenter*1.1){
                         SmartDashboard.putString("Correct to:", "left");
-                        siding.set(ControlMode.PercentOutput, 0.8);}}}
+                        siding.set(ControlMode.PercentOutput, 0.3);}}}
             else{
                 SmartDashboard.putBoolean("Centered?", true);
                 siding.set(ControlMode.PercentOutput, 0);}
                 // Lifting
             /*if (cY < imgHiCenter*0.9 || cY > imgHiCenter*1.1)
-                if((!lmtSwitch[2].get() || !lmtSwitch[3].get()))
+                if((!lmtSwitch[0].get() || !lmtSwitch[1].get()))
                     outputY = 0;
             lifting.set(ControlMode.PercentOutput, outputY);*/
         }
@@ -199,7 +202,7 @@ public class shootingSubsystem extends SubsystemBase {
                 if (!lmtSwitch[2].get() || !lmtSwitch[3].get())
                     wayY = !wayY;
             // Set values
-            siding.set(ControlMode.PercentOutput, outputVal(wayX));
+            //siding.set(ControlMode.PercentOutput, outputVal(wayX));
             //lifting.set(ControlMode.PercentOutput, outputVal(wayY));
     }
 
@@ -234,6 +237,10 @@ public class shootingSubsystem extends SubsystemBase {
             return sensors[i].getRangeMM() < 10;
         else
             return sensors[i + 1].getRangeMM() > 10;
+    }
+
+    public boolean isManual(){
+        return manual;
     }
 }
 

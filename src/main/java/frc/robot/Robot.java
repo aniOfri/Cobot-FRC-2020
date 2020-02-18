@@ -5,6 +5,51 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+// Motors and sensors chart:
+/*
+  Joystick:
+Joystick [name] = new Joystick(0); # USB connected joystick
+
+  USB Camera:
+UsbCamera [name] = CameraServer.getInstance()
+    .startAutomaticCapture(); # USB0 connected camera to the Roborio
+
+    Wheels:
+VictorSPX [name] = new VictorSPX(0); # Right CIM(1/2)
+VictorSPX [name] = new VictorSPX(1); # Right CIM(2/2)
+VictorSPX [name] = new VictorSPX(2); # Left CIM(1/2)
+VictorSPX [name] = new VictorSPX(3); # Left CIM (2/2)
+
+    Siding and lifting (Aim):
+      <!- USE LIMIT SWITCHES -!>
+TalonSRX [name] = new TalonSRX(5); # Siding mechanism (Right - Left)
+TalonSRX [name] = new TalonSRX(4); # Lifting mechanism (Up - Down)
+
+    Shooting:
+VictorSP [name] = new VictorSP(0); # Right Mini-CIM (Shooting mechanism)
+VictorSP [name] = new VictorSP(1); # Left Mini-CIM (Shooting mechanism)
+VictorSP [name] = new VictorSP(2); # Pushing Mechanism
+
+    Climbing:
+VictorSP [name] = new VictorSP(3); # Elevator mechanism
+VictorSP [name] = new VictorSP(4); # Balancing mechanism
+VictorSP [name] = new VictorSP(8); # Climbing mechanism (Right)
+VictorSP [name] = new VictorSP(9); # Climbing mechanism (Left)
+
+    Slots (Ball storing)
+VictorSP [name] = new VictorSP(5); # Bottom slot motor
+VictorSP [name] = new VictorSP(6); # Middle slot motor
+VictorSP [name] = new VictorSP(7); # Top slot motor(s)
+
+    Limit Switches:
+DigitalInput [name] = new DigitalInput(1); # Lifting (Bottom)
+DigitalInput [name] = new DigitalInput(2); # Lifting (Top)
+DigitalInput [name] = new DigitalInput(3); # Balancing (Left)
+DigitalInput [name] = new DigitalInput(4); # Balancing (Right)
+DigitalInput [name] = new DigitalInput(5); # Siding (Right)
+DigitalInput [name] = new DigitalInput(6); # Siding (Left)
+ */
+
 package frc.robot;
 
 // Import Essentials
@@ -24,6 +69,7 @@ public class Robot extends TimedRobot {
   //climbingSubsystem climb;
   shootingSubsystem shoot;
 
+
   @Override
   public void robotInit() {
     // Initialize stick as a Joystick 
@@ -41,7 +87,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // Movement
-    if (!stick.getRawButton(8))
+    if (!shoot.isManual())
       drive.movement();
 
     // Climbing
