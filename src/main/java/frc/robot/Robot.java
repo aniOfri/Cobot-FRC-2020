@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+
+
 // Motors and sensors chart:
 /*
   Joystick:
@@ -42,12 +44,20 @@ VictorSP [name] = new VictorSP(6); # Middle slot motor
 VictorSP [name] = new VictorSP(7); # Top slot motor(s)
 
     Limit Switches:
-DigitalInput [name] = new DigitalInput(1); # Lifting (Bottom)
-DigitalInput [name] = new DigitalInput(2); # Lifting (Top)
-DigitalInput [name] = new DigitalInput(3); # Balancing (Left)
-DigitalInput [name] = new DigitalInput(4); # Balancing (Right)
-DigitalInput [name] = new DigitalInput(5); # Siding (Right)
-DigitalInput [name] = new DigitalInput(6); # Siding (Left)
+DigitalInput [name] = new DigitalInput(18); # Lifting (Bottom)
+DigitalInput [name] = new DigitalInput(19); # Lifting (Top)
+DigitalInput [name] = new DigitalInput(10); # Balancing (Left)
+DigitalInput [name] = new DigitalInput(11); # Balancing (Right)
+DigitalInput [name] = new DigitalInput(20); # Siding (Right)
+DigitalInput [name] = new DigitalInput(21); # Siding (Left)
+
+    Ultrasonic:
+      Cable 1:
+Ultrasonic [name] = new Ultrasonic(0, 1); # Top Ultrasonic (Trig:Black, Echo:Blue)
+Ultrasonic [name] = new Ultrasonic(2, 3); # Middle Ultrasonic (Trig:Purple, Echo:White)
+Ultrasonic [name] = new Ultrasonic(4, 5); # Bottom Ultrasonic (Trig:Yellow, Echo:Orange)
+      Cable 2:
+
  */
 
 // Joystick buttons' purposes
@@ -109,7 +119,7 @@ public class Robot extends TimedRobot {
       drive.movement();
 
     // Climbing
-    //climb.climbing();
+    climb.climbing();
 
     // Shooting
     shoot.shooting();

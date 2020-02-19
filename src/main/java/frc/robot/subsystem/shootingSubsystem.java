@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import frc.robot.subsystem.shootingPIDSubsystem;
 
 import java.util.ArrayList;
 import java.util.Queue;
@@ -31,12 +32,8 @@ public class shootingSubsystem extends SubsystemBase {
     boolean wayX;
     boolean wayY;
 
+    shootingPIDSubsystem PID;
 
-    double previous_error_x = 0;
-    double integral_x = 0;
-
-    ArrayList<Double> last_errors_x = new ArrayList<Double>();
-    int last_errors_x_idx = 0;
     // Ball Slotting
     VictorSP slots[];
 
@@ -54,6 +51,8 @@ public class shootingSubsystem extends SubsystemBase {
     Joystick stick;
 
     public shootingSubsystem() {
+        //
+        PID = new shootingPIDSubsystem();
         // Initialize shooters
         right_shooter = new VictorSP(0);
         left_shooter = new VictorSP(1);
@@ -71,23 +70,22 @@ public class shootingSubsystem extends SubsystemBase {
         slots[2] = new VictorSP(7); // Top slot motor(s)
 
         // Initialize sensors
-        sensors = new Ultrasonic[5];
-        sensors[0] = new Ultrasonic(10, 11);
-        sensors[1] = new Ultrasonic(12, 13);
-        sensors[2] = new Ultrasonic(14, 15);
-        sensors[3] = new Ultrasonic(16, 17);
-        sensors[4] = new Ultrasonic(18, 19);
+        sensors = new Ultrasonic[3];
+        sensors[0] = new Ultrasonic(0, 1);
+        sensors[1] = new Ultrasonic(3, 2);
+        sensors[2] = new Ultrasonic(4, 5);
 
-        for (int i = 0; i < 5; i++) {
+
+        for (int i = 0; i < 3; i++) {
             sensors[i].setAutomaticMode(true);
         }
 
         // Initialize Limit Switch
         lmtSwitch = new DigitalInput[4];
-        lmtSwitch[0] = new DigitalInput(1); // Lifting (Bottom)
-        lmtSwitch[1] = new DigitalInput(2); // Lifting (Top)
-        lmtSwitch[2] = new DigitalInput(5); // Siding (Right)
-        lmtSwitch[3] = new DigitalInput(6); // Siding (Left)
+        lmtSwitch[0] = new DigitalInput(18); // Lifting (Bottom)
+        lmtSwitch[1] = new DigitalInput(19); // Lifting (Top)
+        lmtSwitch[2] = new DigitalInput(20); // Siding (Right)
+        lmtSwitch[3] = new DigitalInput(21); // Siding (Left)
 
         // Toggler
         manual = false;
@@ -106,8 +104,9 @@ public class shootingSubsystem extends SubsystemBase {
         /**/
 
         if (auto) {
-            sidingAndLifting();
-            if (manual)
+            if (!manual)
+                sidingAndLifting();
+            else
                 manualSidingAndLifting();
         } else {
             siding.set(ControlMode.PercentOutput, 0);
@@ -134,18 +133,15 @@ public class shootingSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Manual?", manual);
         SmartDashboard.putBoolean("Auto?", auto);
 
-        SmartDashboard.putNumber("Ultrasonic[0]", sensors[0].getRangeMM());
-        SmartDashboard.putNumber("Ultrasonic[1]", sensors[1].getRangeMM());
-        SmartDashboard.putNumber("Ultrasonic[2]", sensors[2].getRangeMM());
-        SmartDashboard.putNumber("Ultrasonic[3]", sensors[3].getRangeMM());
-        SmartDashboard.putNumber("Ultrasonic[4]", sensors[4].getRangeMM());
-
+        for (int i = 0; i < 3; i++) {
+            SmartDashboard.putNumber("Ultrasonic["+i+"]", sensors[i].getRangeMM());
+        }
         SmartDashboard.putNumber("Siding", siding.getMotorOutputPercent());
         SmartDashboard.putNumber("Lifting", lifting.getMotorOutputPercent());
     }
 
     // Manual shooting
-    private void manualShooting() {
+    private void manualShooting()   {
         // If trigger is pressed
         if (stick.getTop())
             spin(1);
@@ -204,37 +200,14 @@ public class shootingSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("imgWCenter", imgWidCenter);
             SmartDashboard.putNumber("imgHCenter", imgHiCenter);
 
-            double error_x = (imgWidCenter - cX); // Error = Target - Actual
 
+            outputX = PID.PID_X(imgWidCenter, cX)*0.01;
+            outputY = PID.PID_Y(imgHiCenter, cY)*0.01;
+            outputY = 0;
 
-            last_errors_x.add(error_x);
-            last_errors_x_idx += 1;
-            if (last_errors_x_idx == 10) {
-                last_errors_x.remove(0);
-                double avg_error_x = 0;
-                for (int i = 0; i < last_errors_x.size(); i++) {
-                    avg_error_x += last_errors_x.get(i);
-                }
-                avg_error_x /= last_errors_x.size();
-                error_x = avg_error_x;
-                last_errors_x_idx--;
-            }
-            integral_x += (error_x*.02); // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
-            double derivative = (error_x - previous_error_x) / .02;
-            previous_error_x = error_x;
-            double Px = 0.1;
-            double Ix = 0.03;
-            double Dx = 0.02;
-            double new_fix = Px*error_x + Ix*integral_x + Dx*derivative;
-            outputX = new_fix*0.01;
-//            if((imgWidCenter - cX) < -20)
-//                outputX = -0.11; // * (imgWidCenter - cX) / imgWidCenter * 2;
-//            else if((imgWidCenter - cX) > 20)
-//                outputX = 0.11;
-            outputY = -0.0; // * (imgHiCenter - cY) / imgHiCenter * 2;
 
             SmartDashboard.putNumber("outputX", outputX);
-            SmartDashboard.putNumber("outputY", integral_x);
+            SmartDashboard.putNumber("outputY", outputY);
 
             // Set output value depending on the goal's location
             // Siding
@@ -292,7 +265,6 @@ public class shootingSubsystem extends SubsystemBase {
         else
             return -0.1;
     }
-
 
     // Reloading
     private void reloading() {

@@ -23,6 +23,8 @@ public class climbingSubsystem extends SubsystemBase {
     // LimitSwitch
     DigitalInput left;
     DigitalInput right;
+    DigitalInput elevatorMax;
+    DigitalInput elevatorMin;
 
     // Joystick
     Joystick stick;
@@ -45,8 +47,10 @@ public class climbingSubsystem extends SubsystemBase {
         stick = new Joystick(0);
 
         // Initialize LimitSwitch
-        left = new DigitalInput(3); // Balance (Left)
-        right = new DigitalInput(4); // Balance (Right)
+        left = new DigitalInput(10); // Balance (Left)
+        right = new DigitalInput(11); // Balance (Right)
+        elevatorMin = new DigitalInput(12); // Elevator (Min)
+        elevatorMax = new DigitalInput(13); // Elevator (Max)
 
         // Initialize autonomous toggle
         autoBalance = false;
@@ -67,6 +71,8 @@ public class climbingSubsystem extends SubsystemBase {
         //SmartDashboard.putNumber("distance (R)",high_R.getRangeMM());
         SmartDashboard.putBoolean("left", !left.get());
         SmartDashboard.putBoolean("right", !right.get());
+        SmartDashboard.putBoolean("elevatorMin", !elevatorMin.get());
+        SmartDashboard.putBoolean("elevatorMax", !elevatorMax.get());
 
         /*// Toggle auto-balancing
         if (stick.getRawButton(11)
