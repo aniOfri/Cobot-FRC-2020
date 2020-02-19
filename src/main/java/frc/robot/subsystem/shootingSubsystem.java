@@ -39,6 +39,8 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Ultrasonics
     Ultrasonic[] sensors;
+    int maxSlot;
+    int slot;
 
     // LimitSwitch
     DigitalInput[] lmtSwitch;
@@ -70,13 +72,15 @@ public class shootingSubsystem extends SubsystemBase {
         slots[2] = new VictorSP(7); // Top slot motor(s)
 
         // Initialize sensors
-        sensors = new Ultrasonic[3];
-        sensors[0] = new Ultrasonic(0, 1);
-        sensors[1] = new Ultrasonic(3, 2);
-        sensors[2] = new Ultrasonic(4, 5);
+        sensors = new Ultrasonic[5];
+        sensors[0] = new Ultrasonic(4, 5);
+        sensors[1] = new Ultrasonic(2, 3);
+        sensors[2] = new Ultrasonic(0, 1);
+        sensors[3] = new Ultrasonic(6, 7);
+        sensors[4] = new Ultrasonic(8, 9);
 
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < sensors.length; i++) {
             sensors[i].setAutomaticMode(true);
         }
 
@@ -133,8 +137,9 @@ public class shootingSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Manual?", manual);
         SmartDashboard.putBoolean("Auto?", auto);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < sensors.length; i++) {
             SmartDashboard.putNumber("Ultrasonic["+i+"]", sensors[i].getRangeMM());
+            SmartDashboard.putBoolean("Ultrasonic["+i+"] Detection", detect(i, 100));
         }
         SmartDashboard.putNumber("Siding", siding.getMotorOutputPercent());
         SmartDashboard.putNumber("Lifting", lifting.getMotorOutputPercent());
@@ -268,35 +273,45 @@ public class shootingSubsystem extends SubsystemBase {
 
     // Reloading
     private void reloading() {
-        /*if(stick.getRawButton(7) && !detect(2,true)){
-            slots[0].set(0.6);}
+        if(stick.getRawButton(7) && !detect(0, 100)){
+            SmartDashboard.putBoolean("loading", true);
+            for (int i = 0; i < 3; i++)
+                slots[i].set(0.6);}
         else{
-            slots[0].set(0);}
+            SmartDashboard.putBoolean("loading", false);
+            for (int i = sensors.length - 1; i >= 0; i--)
+                if(!detect(i, 100)){
+                    maxSlot = i;
+                    SmartDashboard.putNumber("maxSlot", maxSlot);
+                    break;}
+                for (int j = 0; j < maxSlot; j++) {
+                    if (j > 2)
+                        slot = 2;
+                    else
+                        slot = j;
 
-        // Check for every sensors if a ball is present
-        for(int i = 0; i < 3; i++){
-            if (detect(i, true) &&
-                !detect(i, false))
-                slots[i].set(0.6);
-            else
-                slots[i].set(0);
-        }*/
+                    if (detect(j, 100)){
+                        slots[slot].set(0.6);
+                        if (slot == 0)
+                            slots[1].set(0.6);}
+                    else{
+                        slots[slot].set(0);
+                        if (slot == 0)
+                            slots[1].set(0);}
+                }
+        }
 
-        if (stick.getRawButton(7)) {
+        /*if (stick.getRawButton(7)) {
             for (int i = 0; i < 3; i++)
                 slots[i].set(0.6);
         } else {
             for (int i = 0; i < 3; i++)
                 slots[i].set(0);
-        }
-
+        }*/
     }
 
-    private boolean detect(int i, boolean mode){
-        if (mode)
-            return sensors[i].getRangeMM() < 50;
-        else
-            return sensors[i].getRangeMM() > 80;
+    private boolean detect(int i, double range){
+        return sensors[i].getRangeMM() < range;
     }
 
     public boolean isManual(){

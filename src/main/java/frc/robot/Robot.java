@@ -57,6 +57,9 @@ Ultrasonic [name] = new Ultrasonic(0, 1); # Top Ultrasonic (Trig:Black, Echo:Blu
 Ultrasonic [name] = new Ultrasonic(2, 3); # Middle Ultrasonic (Trig:Purple, Echo:White)
 Ultrasonic [name] = new Ultrasonic(4, 5); # Bottom Ultrasonic (Trig:Yellow, Echo:Orange)
       Cable 2:
+Ultrasonic [name] = new Ultrasonic(6, 7); # Shooter top Ultrasonic (Trig:Green, Echo:White)
+Ultrasonic [name] = new Ultrasonic(8, 9); # Shooter bottom Ultrasonic (Trig:Blue, Echo:Yellow)
+
 
  */
 
