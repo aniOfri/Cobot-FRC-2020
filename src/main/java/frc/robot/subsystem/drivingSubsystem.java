@@ -35,12 +35,16 @@ public class drivingSubsystem extends SubsystemBase{
                 sqrt,
                 xVal,
                 yVal,
+                throttle,
                 finalL = 0,
                 finalR = 0;
 
         // Get Joystick's input
         xVal = -stick.getX();
         yVal = stick.getY();
+
+        // Throttle
+        throttle = stick.getThrottle() * 0.7;
 
         // Algorithm Beep Boop *-*
         if (yVal > 0.2 || yVal < -0.2){
@@ -54,19 +58,22 @@ public class drivingSubsystem extends SubsystemBase{
             finalR = (sqrt + (0.8 * xVal * -negPos * negFix)) * maxLim * -negPos;
         }
         else{
-            finalL = xVal;
-            finalR = xVal;
+            finalL = -xVal * throttle;
+            finalR = -xVal * throttle;
         }
 
         SmartDashboard.putNumber("FinalR", finalR);
         SmartDashboard.putNumber("FinalL", finalL);
 
-        // Sending values to motors
-        right_front.set(ControlMode.PercentOutput, finalR/2);
-        right_rear.set(ControlMode.PercentOutput, finalR/2);
+        finalR *= throttle;
+        finalL *= throttle;
 
-        left_front.set(ControlMode.PercentOutput, finalL/2);
-        left_rear.set(ControlMode.PercentOutput, finalL/2);
+        // Sending values to motors
+        right_front.set(ControlMode.PercentOutput, finalR);
+        right_rear.set(ControlMode.PercentOutput, finalR);
+
+        left_front.set(ControlMode.PercentOutput, finalL);
+        left_rear.set(ControlMode.PercentOutput, finalL);
     }
 }
 

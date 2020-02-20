@@ -43,6 +43,7 @@ public class shootingPIDSubsystem extends SubsystemBase {
                 avg_error_x += last_errors_x.get(i);
             }
             avg_error_x /= last_errors_x.size();
+
             error_x = avg_error_x;
             last_errors_x_idx--;
         }

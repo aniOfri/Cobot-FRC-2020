@@ -100,7 +100,6 @@ public class Robot extends TimedRobot {
   climbingSubsystem climb;
   shootingSubsystem shoot;
 
-
   @Override
   public void robotInit() {
     // Initialize stick as a Joystick 

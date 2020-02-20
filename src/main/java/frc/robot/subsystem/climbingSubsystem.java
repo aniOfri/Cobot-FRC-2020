@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class climbingSubsystem extends SubsystemBase {
 
@@ -40,8 +41,8 @@ public class climbingSubsystem extends SubsystemBase {
         // Initialize climbing motors & balancing
         right_motor = new VictorSP(8);
         left_motor = new VictorSP(9);
-        balance = new VictorSP(4);
         elevator = new VictorSP(3);
+        balance = Constants.VICTORSP.balance;
 
         // Initialize joystick
         stick = new Joystick(0);
@@ -88,9 +89,9 @@ public class climbingSubsystem extends SubsystemBase {
 
         // Balancing motor
         if(stick.getRawButton(4) && right.get())
-            balance.set(1); // Right
+            balance.set(0.6); // Right
         else if(stick.getRawButton(6) && left.get())
-            balance.set(-1); // Left
+            balance.set(-0.6); // Left
         else
             balance.set(0); // None
     }
@@ -112,6 +113,17 @@ public class climbingSubsystem extends SubsystemBase {
     private void spin(int mode){
         right_motor.set(mode *  0.5);
         left_motor.set(mode * -0.5);
+    }
+    public void elevator(){
+        if(stick.getRawButton(9) && !elevatorMin.get()){//up
+            elevator.set(1);
+        }
+        if(stick.getRawButton(11)&& !elevatorMax.get()){//down
+            elevator.set(-1);
+        }
+        else{
+            elevator.set(0);
+        }
     }
 
 }
