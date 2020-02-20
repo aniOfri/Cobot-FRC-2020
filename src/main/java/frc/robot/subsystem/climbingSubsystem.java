@@ -118,15 +118,12 @@ public class climbingSubsystem extends SubsystemBase {
         left_motor.set(mode * -0.5);
     }
     public void elevator(){
-        if(stickA.getRawButton(9) && !elevatorMin.get()){//up
+        if(stickA.getRawButton(9) && !elevatorMin.get())//up
             elevator.set(1);
-        }
-        if(stickA.getRawButton(11)&& !elevatorMax.get()){//down
+        if(stickA.getRawButton(11) && !elevatorMax.get())//down
             elevator.set(-1);
-        }
-        else{
+        else
             elevator.set(0);
-        }
     }
 
 }

@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj.VictorSP;
 
 public class Constants {
     public static class MISC{
+            // Joystick
         public static final Joystick joystick_a = new Joystick(0);
         public static final Joystick joystick_b = new Joystick(1);
-
     }
     public static class VICTORSP {
             // Shooting mechanism

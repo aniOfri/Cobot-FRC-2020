@@ -50,9 +50,9 @@ public class shootingPIDSubsystem extends SubsystemBase {
         integral_x += (error_x*.02); // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
         derivative_x = (error_x - previous_error_x) / .02;
         previous_error_x = error_x;
-        Px = 0.1;
-        Ix = 0.03;
-        Dx = 0.02;
+        Px = 0.2;
+        Ix = 0.08;
+        Dx = 0.03;
         new_fix_x = Px*error_x + Ix*integral_x + Dx*derivative_x;
         SmartDashboard.putNumber("integral_x", integral_x);
         return new_fix_x;
@@ -75,9 +75,9 @@ public class shootingPIDSubsystem extends SubsystemBase {
         integral_y += (error_y*.02); // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
         derivative_y = (error_y - previous_error_y) / .02;
         previous_error_y = error_y;
-        Py = 0.1;
-        Iy = 0.03;
-        Dy = 0.02;
+        Py = 0.12;
+        Iy = 0.02;
+        Dy = 0.01;
         new_fix_y = Py*error_y + Iy*integral_y + Dy*derivative_y;
         SmartDashboard.putNumber("integral_y", integral_y);
         return new_fix_y;
