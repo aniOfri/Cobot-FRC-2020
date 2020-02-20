@@ -28,7 +28,7 @@ public class climbingSubsystem extends SubsystemBase {
     DigitalInput elevatorMin;
 
     // Joystick
-    Joystick stick;
+    Joystick stickA;
 
     // autoBalance toggle
     boolean autoBalance;
@@ -39,19 +39,19 @@ public class climbingSubsystem extends SubsystemBase {
         high_R=new Ultrasonic(3,4);//echo 2*/
 
         // Initialize climbing motors & balancing
-        right_motor = new VictorSP(8);
-        left_motor = new VictorSP(9);
-        elevator = new VictorSP(3);
+        right_motor = Constants.VICTORSP.right_climb;
+        left_motor = Constants.VICTORSP.left_climb;
+        elevator = Constants.VICTORSP.elevator;
         balance = Constants.VICTORSP.balance;
 
-        // Initialize joystick
-        stick = new Joystick(0);
+        // Initialize joystickA
+        stickA = Constants.MISC.joystick_a;
 
         // Initialize LimitSwitch
-        left = new DigitalInput(10); // Balance (Left)
-        right = new DigitalInput(11); // Balance (Right)
-        elevatorMin = new DigitalInput(12); // Elevator (Min)
-        elevatorMax = new DigitalInput(13); // Elevator (Max)
+        left = Constants.DIO.balancing_left; // Balance (Left)
+        right = Constants.DIO.balancing_right; // Balance (Right)
+        elevatorMin = Constants.DIO.elevator_min; // Elevator (Min)
+        elevatorMax = Constants.DIO.elevator_max; // Elevator (Max)
 
         // Initialize autonomous toggle
         autoBalance = false;
@@ -60,6 +60,9 @@ public class climbingSubsystem extends SubsystemBase {
     public void climbing(){
         // Manual climbing
         manualClimbing();
+
+        // Elevator
+        elevator();
 
         // Autonomous balancing
         if (autoBalance)
@@ -76,21 +79,21 @@ public class climbingSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("elevatorMax", !elevatorMax.get());
 
         /*// Toggle auto-balancing
-        if (stick.getRawButton(11)
+        if (stickA.getRawButton(11)
             autoBalance = !autoBalance;*/
 
         /// Spin motor
-        if(stick.getRawButton(3))
+        if(stickA.getRawButton(3))
             spin(1); // Clockwise
-        else if(stick.getRawButton(5))
+        else if(stickA.getRawButton(5))
             spin(-1); // Counter Clockwise
         else
             spin(0); // Neutral mode*/
 
         // Balancing motor
-        if(stick.getRawButton(4) && right.get())
+        if(stickA.getRawButton(4) && right.get())
             balance.set(0.6); // Right
-        else if(stick.getRawButton(6) && left.get())
+        else if(stickA.getRawButton(6) && left.get())
             balance.set(-0.6); // Left
         else
             balance.set(0); // None
@@ -115,10 +118,10 @@ public class climbingSubsystem extends SubsystemBase {
         left_motor.set(mode * -0.5);
     }
     public void elevator(){
-        if(stick.getRawButton(9) && !elevatorMin.get()){//up
+        if(stickA.getRawButton(9) && !elevatorMin.get()){//up
             elevator.set(1);
         }
-        if(stick.getRawButton(11)&& !elevatorMax.get()){//down
+        if(stickA.getRawButton(11)&& !elevatorMax.get()){//down
             elevator.set(-1);
         }
         else{

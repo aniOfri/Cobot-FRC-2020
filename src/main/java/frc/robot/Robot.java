@@ -85,7 +85,7 @@ package frc.robot;
 
 // Import Essentials
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
@@ -94,7 +94,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
-  Joystick stick;
   UsbCamera usbCam;
   drivingSubsystem drive;
   climbingSubsystem climb;
@@ -102,14 +101,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // Initialize stick as a Joystick 
-    stick = new Joystick(0);
-
     // Initialize subsystems
     drive = new drivingSubsystem();
     climb = new climbingSubsystem();
     shoot = new shootingSubsystem();
 
+    // Initialize and configure usbCam
     usbCam = CameraServer.getInstance().startAutomaticCapture();
     usbCam.setResolution(320,240);
     }

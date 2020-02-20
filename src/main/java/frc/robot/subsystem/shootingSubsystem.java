@@ -59,38 +59,37 @@ public class shootingSubsystem extends SubsystemBase {
     boolean auto;
 
     // Joystick
-    Joystick stick;
-
+    Joystick stickB ;
+        
     public shootingSubsystem() {
         // Subsystems
         PID = new shootingPIDSubsystem();
         // Initialize shooters
-        right_shooter = new VictorSP(0);
-        left_shooter = new VictorSP(1);
-        push = new VictorSP(2);
+        right_shooter = Constants.VICTORSP.right_shooter;
+        left_shooter = Constants.VICTORSP.left_shooter;
+        push = Constants.VICTORSP.push;
 
         // Initialize siding and lifting
-        siding = new TalonSRX(5);
-        lifting = new TalonSRX(4);
+        siding = Constants.CAN.siding;
+        lifting = Constants.CAN.lifting;
 
 
         // Initialize slot motors
         slots = new VictorSP[4];
-        slots[0] = new VictorSP(5); // Bottom slot motor
-        slots[1] = new VictorSP(6); // Mid slot motor
-        slots[2] = new VictorSP(7); // Top slot motor
+        slots[0] = Constants.VICTORSP.bot_slot; // Bottom slot motor
+        slots[1] = Constants.VICTORSP.mid_slot; // Mid slot motor
+        slots[2] = Constants.VICTORSP.top_slot; // Top slot motor
         slots[3] = Constants.VICTORSP.balance;
 
         // Initialize sensors
         sensors = new Ultrasonic[7];
-        sensors[0] = new Ultrasonic(4, 5);
-        sensors[1] = new Ultrasonic(2, 3);
-        sensors[2] = new Ultrasonic(0, 1);
-        sensors[3] = new Ultrasonic(6, 7);
-        sensors[4] = new Ultrasonic(8, 9);
-        sensors[5] = new Ultrasonic(14, 15);
-        sensors[6] = new Ultrasonic(16, 17);
-
+        sensors[0] = Constants.ULTRASONIC.bot_slot_sens;
+        sensors[1] = Constants.ULTRASONIC.mid_slot_sens;
+        sensors[2] = Constants.ULTRASONIC.top_slot_sens;
+        sensors[3] = Constants.ULTRASONIC.top_shoot_sens;
+        sensors[4] = Constants.ULTRASONIC.bot_shoot_sens;
+        sensors[5] = Constants.ULTRASONIC.high_R;
+        sensors[6] = Constants.ULTRASONIC.high_L;
 
         for (int i = 0; i < sensors.length; i++) {
             sensors[i].setAutomaticMode(true);
@@ -99,13 +98,12 @@ public class shootingSubsystem extends SubsystemBase {
         // Range in MM
         range = 100;
 
-
         // Initialize Limit Switch
         lmtSwitch = new DigitalInput[4];
-        lmtSwitch[0] = new DigitalInput(18); // Lifting (Bottom)
-        lmtSwitch[1] = new DigitalInput(19); // Lifting (Top)
-        lmtSwitch[2] = new DigitalInput(20); // Siding (Right)
-        lmtSwitch[3] = new DigitalInput(21); // Siding (Left)
+        lmtSwitch[0] = Constants.DIO.lifting_min; // Lifting (Bottom)
+        lmtSwitch[1] = Constants.DIO.lifting_max; // Lifting (Top)
+        lmtSwitch[2] = Constants.DIO.siding_right; // Siding (Right)
+        lmtSwitch[3] = Constants.DIO.siding_left; // Siding (Left)
 
         // Toggler
         manual = false;
@@ -113,11 +111,11 @@ public class shootingSubsystem extends SubsystemBase {
         wasTrue = false;
 
         // Timer
+        motor = new Timer();
         posCheck = new Timer();
         posCheck.start();
-        motor=new Timer();
         // Initialize joystick
-        stick = new Joystick(0);
+        stickB = Constants.MISC.joystick_b;
     }
 
     public void shooting() {
@@ -128,8 +126,6 @@ public class shootingSubsystem extends SubsystemBase {
             spin(0);
             push.set(0);
         }
-
-
         // Manual siding and lifting
         /**/
 
@@ -148,13 +144,13 @@ public class shootingSubsystem extends SubsystemBase {
         //    sidingAndLifting();
 
         // Reloading
-        if(!stick.getRawButton(4) || !stick.getRawButton(6))
+        if(!stickB.getRawButton(4) || !stickB.getRawButton(6))
             reloading();
 
-        if (stick.getRawButtonPressed(8))
+        if (stickB.getRawButtonPressed(8))
             manual = !manual;
 
-        if (stick.getRawButtonPressed(10))
+        if (stickB.getRawButtonPressed(10))
             auto = !auto;
 
         SmartDashboard.putBoolean("Lifting (Min)", !lmtSwitch[0].get());
@@ -166,7 +162,10 @@ public class shootingSubsystem extends SubsystemBase {
 
         for (int i = 0; i < sensors.length; i++) {
             SmartDashboard.putNumber("Ultrasonic["+i+"]", sensors[i].getRangeMM());
-            SmartDashboard.putBoolean("Ultrasonic["+i+"] Detection", detect(i, range));
+            if (i != 4)
+                SmartDashboard.putBoolean("Ultrasonic["+i+"] Detection", detect(i, range));
+            else
+                SmartDashboard.putBoolean("Ultrasonic["+i+"] Detection", detect(i, range+50));
         }
         SmartDashboard.putNumber("Siding", siding.getMotorOutputPercent());
         SmartDashboard.putNumber("Lifting", lifting.getMotorOutputPercent());
@@ -176,13 +175,13 @@ public class shootingSubsystem extends SubsystemBase {
     // Manual shooting
     private void manualShooting()   {
         // If trigger is pressed
-        if (stick.getTop())
+        if (stickB.getTop())
             spin(1);
             // Else, set the motors to 0
         else
             spin(0);
 
-        if (stick.getTrigger() && stick.getTop())
+        if (stickB.getTrigger() && stickB.getTop())
             push.set(0.6);
         else {
             push.set(0);
@@ -205,19 +204,19 @@ public class shootingSubsystem extends SubsystemBase {
 
         // Manual siding and lifting movement
         // Siding
-        if (!lmtSwitch[2].get() && stick.getX() < 0)
-            outputX = 0.3 * -stick.getX();
-        else if (!lmtSwitch[3].get() && -stick.getX() > 0)
-            outputX = 0.3 * -stick.getX();
+        if (!lmtSwitch[2].get() && stickB.getX() < 0)
+            outputX = 0.3 * -stickB.getX();
+        else if (!lmtSwitch[3].get() && -stickB.getX() > 0)
+            outputX = 0.3 * -stickB.getX();
         else if (lmtSwitch[2].get() && lmtSwitch[3].get())
-            outputX = 0.3 * -stick.getX();
+            outputX = 0.3 * -stickB.getX();
         // Lifting
-        if (!lmtSwitch[0].get() && -stick.getY() > 0)
-            outputY = 0.3 * stick.getY();
-        else if (!lmtSwitch[1].get() && -stick.getY() < 0)
-            outputY = 0.3 * stick.getY();
+        if (!lmtSwitch[0].get() && -stickB.getY() > 0)
+            outputY = 0.3 * stickB.getY();
+        else if (!lmtSwitch[1].get() && -stickB.getY() < 0)
+            outputY = 0.3 * stickB.getY();
         else if (lmtSwitch[0].get() && lmtSwitch[1].get())
-            outputY = 0.3 * stick.getY();
+            outputY = 0.3 * stickB.getY();
 
         // Set values
         siding.set(ControlMode.PercentOutput, outputX);
@@ -307,7 +306,7 @@ public class shootingSubsystem extends SubsystemBase {
     // Reloading
     private void reloading() {
         // Motor (0)
-        if((stick.getRawButton(7) && !detect(0, range)) ||
+        if((stickB.getRawButton(7) && !detect(0, range)) ||
             (!detect(1, range) && detect(0, range))){
             SmartDashboard.putBoolean("Motor(0):", true);
             slots[0].set(0.6);}
@@ -343,7 +342,7 @@ public class shootingSubsystem extends SubsystemBase {
         }
         // Motor (3)
         if ((!detect(3, range) && detect(2, range)) ||
-                (!detect(4, range) && detect(3, range) || shot)) {
+                (!detect(4, range+50) && detect(3, range) || shot)) {
             SmartDashboard.putBoolean("Motor(3):", true);
             shot = false;
             if (posCheck.get() > 1) {

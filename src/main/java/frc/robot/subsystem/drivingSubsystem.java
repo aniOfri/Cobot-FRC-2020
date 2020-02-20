@@ -1,11 +1,13 @@
 package frc.robot.subsystem;
 
 
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.Joystick;
+import frc.robot.Constants;
 
 public class drivingSubsystem extends SubsystemBase{
 
@@ -16,17 +18,17 @@ public class drivingSubsystem extends SubsystemBase{
     VictorSPX right_rear;
 
     // Joystick
-    Joystick stick;
+    Joystick stickA;
 
     public drivingSubsystem() {
         // Initialize wheels
-        right_rear=new VictorSPX(0);
-        right_front=new VictorSPX(1);
-        left_rear=new VictorSPX(2);
-        left_front=new VictorSPX(3);
+        right_rear= Constants.CAN.right_rear;
+        right_front= Constants.CAN.right_front;
+        left_rear= Constants.CAN.left_rear;
+        left_front= Constants.CAN.left_front;
 
         // Initialize joystick
-        stick = new Joystick(0);
+        stickA = Constants.MISC.joystick_a;
     }
 
     public void movement() {
@@ -40,11 +42,11 @@ public class drivingSubsystem extends SubsystemBase{
                 finalR = 0;
 
         // Get Joystick's input
-        xVal = -stick.getX();
-        yVal = stick.getY();
+        xVal = -stickA.getX();
+        yVal = stickA.getY();
 
         // Throttle
-        throttle = stick.getThrottle() * 0.7;
+        throttle = stickA.getThrottle() * 0.7;
 
         // Algorithm Beep Boop *-*
         if (yVal > 0.2 || yVal < -0.2){
