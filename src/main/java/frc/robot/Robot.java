@@ -90,7 +90,6 @@ import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 import frc.robot.subsystem.shootingSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
@@ -112,10 +111,10 @@ public class Robot extends TimedRobot {
     }
 
   @Override
+
   public void robotPeriodic() {
-    // Movement
-    if (!shoot.isManual())
-      drive.movement();
+    // Driving
+    drive.driving();
 
     // Climbing
     climb.climbing();

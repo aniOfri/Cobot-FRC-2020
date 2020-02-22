@@ -1,81 +1,56 @@
 package frc.robot.subsystem;
 
-
-import edu.wpi.first.wpilibj.CAN;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Constants;
 
 public class drivingSubsystem extends SubsystemBase{
-
+ 
     // Wheels
-    VictorSPX left_front;
-    VictorSPX left_rear;
-    VictorSPX right_front;
-    VictorSPX right_rear;
+    WPI_VictorSPX fl;
+    WPI_VictorSPX bl;
+    WPI_VictorSPX fr;
+    WPI_VictorSPX br;
 
+    // Diff. Drive
+    DifferentialDrive diffDrive;
+        // SpeedCont. Group
+    SpeedControllerGroup left;
+    SpeedControllerGroup right;
+        // Values
+    double throttle, yVal, xVal;
+    
     // Joystick
     Joystick stickA;
 
     public drivingSubsystem() {
         // Initialize wheels
-        right_rear= Constants.CAN.right_rear;
-        right_front= Constants.CAN.right_front;
-        left_rear= Constants.CAN.left_rear;
-        left_front= Constants.CAN.left_front;
+        fl = Constants.CAN.left_front;
+        fr = Constants.CAN.right_front;
+        bl = Constants.CAN.left_rear;
+        br = Constants.CAN.right_rear;
 
+        // Initialize SpeedCont. Groups
+        left = new SpeedControllerGroup(fl,bl);
+        right = new SpeedControllerGroup(fr, br);
+        diffDrive = new DifferentialDrive(left, right);
+        
         // Initialize joystick
         stickA = Constants.MISC.joystick_a;
     }
+    public void driving(){
 
-    public void movement() {
-        // Declare variables
-        double maxLim,
-                sqrt,
-                xVal,
-                yVal,
-                throttle,
-                finalL = 0,
-                finalR = 0;
+        throttle = stickA.getThrottle();
+        yVal = 0.7 * throttle * -stickA.getY(); 
+        xVal = throttle * stickA.getX();
 
-        // Get Joystick's input
-        xVal = -stickA.getX();
-        yVal = stickA.getY();
-
-        // Throttle
-        throttle = stickA.getThrottle() * 0.7;
-
-        // Algorithm Beep Boop *-*
-        if (yVal > 0.2 || yVal < -0.2){
-            int negFix = yVal < -0.2 ? -1 : 1,
-                    negPos = (int) (yVal / Math.abs(yVal));
-
-            maxLim = 0.85;
-            sqrt = Math.sqrt(xVal * xVal + yVal * yVal);
-
-            finalL = sqrt * maxLim * negPos;
-            finalR = (sqrt + (0.8 * xVal * -negPos * negFix)) * maxLim * -negPos;
-        }
-        else{
-            finalL = -xVal * throttle;
-            finalR = -xVal * throttle;
-        }
-
-        SmartDashboard.putNumber("FinalR", finalR);
-        SmartDashboard.putNumber("FinalL", finalL);
-
-        finalR *= throttle;
-        finalL *= throttle;
-
-        // Sending values to motors
-        right_front.set(ControlMode.PercentOutput, finalR);
-        right_rear.set(ControlMode.PercentOutput, finalR);
-
-        left_front.set(ControlMode.PercentOutput, finalL);
-        left_rear.set(ControlMode.PercentOutput, finalL);
+        //xVal controls the turn of the driving 
+        //yVal controls the speed of the driving   
+        diffDrive.curvatureDrive(yVal, xVal, true);
     }
 }
 

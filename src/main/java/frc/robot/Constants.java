@@ -1,17 +1,35 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.VictorSP;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 
 public class Constants {
-    public static class MISC{
+    public static class MISC {
             // Joystick
         public static final Joystick joystick_a = new Joystick(0);
         public static final Joystick joystick_b = new Joystick(1);
+            // Timer
+        public static final Timer top_slot_timer = new Timer();
+        public static final Timer feeder_timer = new Timer();
+        public static final Timer push_timer = new Timer();
+        public static final Timer ball_presence_timer = new Timer();
+            // PID
+        public static final double Px = 0.24;
+        public static final double Ix = 0.08;
+        public static final double Dx = 0.03;
+        public static final double Py = 0.12;
+        public static final double Iy = 0.08;
+        public static final double Dy = 0.01;
+            // Integer
+        public static final int ultrasonic_range = 100;
+            // Accelerometer
+        public static final ADXL345_I2C acc_sens = new
+                ADXL345_I2C(I2C.Port.kOnboard, Accelerometer.Range.k2G, 0x53);
+                
+                
     }
     public static class VICTORSP {
             // Shooting mechanism
@@ -31,10 +49,10 @@ public class Constants {
     }
     public static class CAN{
             // Wheels
-        public static final VictorSPX right_rear = new VictorSPX(0);
-        public static final VictorSPX right_front = new VictorSPX(1);
-        public static final VictorSPX left_rear = new VictorSPX(2);
-        public static final VictorSPX left_front = new VictorSPX(3);
+        public static final WPI_VictorSPX right_rear = new WPI_VictorSPX(0);
+        public static final WPI_VictorSPX right_front = new WPI_VictorSPX(1);
+        public static final WPI_VictorSPX left_rear = new WPI_VictorSPX(2);
+        public static final WPI_VictorSPX left_front = new WPI_VictorSPX(3);
             // Siding and lifting
         public static final TalonSRX lifting = new TalonSRX(4);
         public static final TalonSRX siding = new TalonSRX(5);
