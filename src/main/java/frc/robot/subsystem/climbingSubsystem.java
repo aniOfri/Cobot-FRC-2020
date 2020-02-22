@@ -30,6 +30,7 @@ public class climbingSubsystem extends SubsystemBase {
 
     // Joystick
     Joystick stickA;
+    Joystick stickB;
 
     // autoBalance toggle
     boolean autoBalance;
@@ -50,6 +51,7 @@ public class climbingSubsystem extends SubsystemBase {
 
         // Initialize joystickA
         stickA = Constants.MISC.joystick_a;
+        stickB = Constants.MISC.joystick_b;
 
         // Initialize LimitSwitch
         left = Constants.DIO.balancing_left; // Balance (Left)
@@ -63,6 +65,9 @@ public class climbingSubsystem extends SubsystemBase {
 
     public void climbing(){
         // Manual climbing
+        if (stickA.getRawButtonPressed(12))
+            autoBalance = !autoBalance;
+
         if (!autoBalance)
             manualClimbing();
         // Autonomous balancing
@@ -75,9 +80,7 @@ public class climbingSubsystem extends SubsystemBase {
         // Climbing Smartdashboard
         smartDashboard();
 
-        // Toggle auto-balancing
-        if (stickA.getRawButtonPressed(12))
-            autoBalance = !autoBalance;
+        
     }
 
     // Manual climbing
@@ -86,56 +89,74 @@ public class climbingSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("right", !right.get());
 
         /// Spin motor
-        if(stickA.getRawButton(3)) {
-            spinL(1); // Clockwise
+        if(stickA.getRawButton(6)) {
             spinR(1); // Clockwise
         }
-        else if(stickA.getRawButton(5)) {
-            spinL(-1); // Counter Clockwise
+        else if(stickA.getRawButton(4)){
             spinR(-1); // Counter Clockwise
         }
         else {
-            spinL(0); // Neutral mode*/
             spinR(0); // Neutral mode*/
         }
 
-        // Balancing motor
-        if(stickA.getRawButton(4) && right.get())
-            balance.set(0.6); // Right
-        else if(stickA.getRawButton(6) && left.get())
-            balance.set(-0.6); // Left
-        else {
-            balance.set(0);
+        if(stickA.getRawButton(5)) {
+            spinL(1); // Clockwise
         }
+        else if(stickA.getRawButton(3)){
+            spinL(-1); // Counter Clockwise
+        }
+        else {
+            spinL(0); // Neutral mode*/
+        }
+
+        // Balancing motor
+        if (stickB.getRawButton(8)){
+            if (right.get())
+                balance.set(1);
+            else if (!left.get())
+                balance.set(1);
+        }
+        else if (stickB.getRawButton(7)){
+            if (left.get())
+                balance.set(-1);
+            else if (!right.get())
+                balance.set(-1);
+        }
+        else
+            balance.set(0);
     }
 
     // Autonomous balancing
     public void autonomousBalance(){
          //If sensor detects range less than 200 on either side
+        if(!elevatorMin.get()){
+            if (high_R.getRangeMM() <= 150)
+                spinL(1); // Clockwise
+            else if (high_R.getRangeMM() >= 300)
+                spinL(-1);
+            else
+                spinL(0);
 
-        if (high_R.getRangeMM() <= 150)
-            spinL(1); // Clockwise
-        else if (high_R.getRangeMM() >= 300)
-            spinL(-1);
-        else
-            spinL(0);
+             //If sensor detects range greater than 400 on either side
+            if (high_L.getRangeMM() <= 150)
+                spinR(1); // Clockwise
+            else if (high_L.getRangeMM() >= 300)
+                spinR(-1);
+            else
+                spinR(0);
 
-         //If sensor detects range greater than 400 on either side
-        if (high_L.getRangeMM() <= 150)
-            spinR(1); // Clockwise
-        else if (high_L.getRangeMM() >= 300)
-            spinR(-1);
-        else
-            spinR(0);
-
-        if(angle()<-5&& left.get()){
-            balance.set(-1);
+            if(angle()<-5&& left.get()){
+                balance.set(-1);
         }
         else if(angle()>5&& right.get()){
             balance.set(1);
         }
         else{
             balance.set(0);
+        }
+        }
+        else{
+            elevator.set(-0.12);
         }
     }
 
@@ -155,12 +176,13 @@ public class climbingSubsystem extends SubsystemBase {
     }
 
     public void elevator(){
-        if(stickA.getRawButton(9)&& elevatorMin.get()){
-            elevator.set(1);
+        if(stickA.getRawButton(9)&& elevatorMax.get()){//Up
+            elevator.set(0.6);
         }
-        else if(stickA.getRawButton(11)&& elevatorMax.get()){
-            elevator.set(-0.5);
+        else if(stickA.getRawButton(11)&& elevatorMin.get()){//down
+            elevator.set(-0.05);
         }
+
         else{
             elevator.set(0);
         }
@@ -169,6 +191,7 @@ public class climbingSubsystem extends SubsystemBase {
     public void smartDashboard(){
         SmartDashboard.putBoolean("elevatorMin", !elevatorMin.get());
         SmartDashboard.putBoolean("elevatorMax", !elevatorMax.get());
+        SmartDashboard.putBoolean("autoBalance?", autoBalance);
         SmartDashboard.putNumber("distance (R)", high_R.getRangeMM());
         SmartDashboard.putNumber("distance (L)", high_L.getRangeMM());
         SmartDashboard.putNumber("angle", angle());

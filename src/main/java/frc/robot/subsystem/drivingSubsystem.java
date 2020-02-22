@@ -25,7 +25,7 @@ public class drivingSubsystem extends SubsystemBase{
     double throttle, yVal, xVal;
     
     // Joystick
-    Joystick stickA;
+    Joystick stickB;
 
     public drivingSubsystem() {
         // Initialize wheels
@@ -40,13 +40,15 @@ public class drivingSubsystem extends SubsystemBase{
         diffDrive = new DifferentialDrive(left, right);
         
         // Initialize joystick
-        stickA = Constants.MISC.joystick_a;
+        stickB = Constants.MISC.joystick_b;
     }
     public void driving(){
-
-        throttle = stickA.getThrottle();
-        yVal = 0.7 * throttle * -stickA.getY(); 
-        xVal = throttle * stickA.getX();
+        throttle = 1;
+        if(stickB.getThrottle() < 0)
+            throttle=-1;
+        
+        yVal = 0.7 * throttle * -stickB.getY();
+        xVal = 0.7 * stickB.getX();
 
         //xVal controls the turn of the driving 
         //yVal controls the speed of the driving   

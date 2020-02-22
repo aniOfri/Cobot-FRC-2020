@@ -5,12 +5,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import frc.robot.subsystem.shootingSubsystem;
 
 public class Constants {
     public static class MISC {
             // Joystick
-        public static final Joystick joystick_a = new Joystick(0);
-        public static final Joystick joystick_b = new Joystick(1);
+        public static final Joystick joystick_a = new Joystick(1);
+        public static final Joystick joystick_b = new Joystick(0);
             // Timer
         public static final Timer top_slot_timer = new Timer();
         public static final Timer feeder_timer = new Timer();
@@ -18,8 +19,8 @@ public class Constants {
         public static final Timer ball_presence_timer = new Timer();
             // PID
         public static final double Px = 0.24;
-        public static final double Ix = 0.08;
-        public static final double Dx = 0.03;
+        public static final double Ix = 0.05;
+        public static final double Dx = 0.04;
         public static final double Py = 0.12;
         public static final double Iy = 0.08;
         public static final double Dy = 0.01;
@@ -28,6 +29,8 @@ public class Constants {
             // Accelerometer
         public static final ADXL345_I2C acc_sens = new
                 ADXL345_I2C(I2C.Port.kOnboard, Accelerometer.Range.k2G, 0x53);
+            // Subsystem
+        public static final shootingSubsystem shoot = new shootingSubsystem();
                 
                 
     }

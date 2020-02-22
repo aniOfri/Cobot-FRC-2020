@@ -87,6 +87,7 @@ package frc.robot;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
+import frc.robot.subsystem.ballFeedingSubsystem;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 import frc.robot.subsystem.shootingSubsystem;
@@ -97,13 +98,15 @@ public class Robot extends TimedRobot {
   drivingSubsystem drive;
   climbingSubsystem climb;
   shootingSubsystem shoot;
+  ballFeedingSubsystem ballFeed;
 
   @Override
   public void robotInit() {
     // Initialize subsystems
+    shoot = Constants.MISC.shoot;
     drive = new drivingSubsystem();
     climb = new climbingSubsystem();
-    shoot = new shootingSubsystem();
+    ballFeed = new ballFeedingSubsystem();
 
     // Initialize and configure usbCam
     usbCam = CameraServer.getInstance().startAutomaticCapture();
@@ -118,6 +121,9 @@ public class Robot extends TimedRobot {
 
     // Climbing
     climb.climbing();
+
+    // Ball Feeding
+    ballFeed.ballFeeding();
 
     // Shooting
     shoot.shooting();

@@ -22,8 +22,9 @@ public class shootingSubsystem extends SubsystemBase {
     // Ball Slots
     VictorSP[] slots;
 
-    // PID Subsystem
+    // Subsystems
     shootingPIDSubsystem PID;
+    ballFeedingSubsystem ballFeed;
 
     // Siding and lifting value
     double cX;
@@ -33,35 +34,23 @@ public class shootingSubsystem extends SubsystemBase {
     double outputX;
     double outputY;
 
-
-    // Sensors
-    // Ultrasonics
-    Ultrasonic[] sensors;
     // LimitSwitch
     DigitalInput[] lmtSwitch;
 
-    // Constants
-    int range;
-
     // Booleans
-    boolean ball_present;
-    boolean ball_loading_limit_switch;
-    boolean manual_mode;
     boolean auto_mode;
-    boolean prev_auto_mode_state;
+    boolean real_auto;
 
-    // Timers
-    Timer ball_loading_timer;
-    Timer feeding_extender_timer;
+    // Pushing timer
     Timer pushing_timer;
-    Timer ball_presence_timer;
 
     // Joystick
-    Joystick stickB;
+    Joystick stickA;
 
     public shootingSubsystem() {
         // Subsystems
         PID = new shootingPIDSubsystem();
+        ballFeed = new ballFeedingSubsystem();
 
         // Initialize shooters
         right_shooter = Constants.VICTORSP.right_shooter;
@@ -78,24 +67,7 @@ public class shootingSubsystem extends SubsystemBase {
         slots[0] = Constants.VICTORSP.bot_slot; // Bottom slot motor
         slots[1] = Constants.VICTORSP.mid_slot; // Mid slot motor
         slots[2] = Constants.VICTORSP.top_slot; // Top slot motor
-        slots[3] = Constants.VICTORSP.balance;
-
-        // Initialize sensors
-        sensors = new Ultrasonic[7];
-        sensors[0] = Constants.ULTRASONIC.bot_slot_sens;
-        sensors[1] = Constants.ULTRASONIC.mid_slot_sens;
-        sensors[2] = Constants.ULTRASONIC.top_slot_sens;
-        sensors[3] = Constants.ULTRASONIC.top_shoot_sens;
-        sensors[4] = Constants.ULTRASONIC.bot_shoot_sens;
-        sensors[5] = Constants.ULTRASONIC.high_R;
-        sensors[6] = Constants.ULTRASONIC.high_L;
-
-        // Set Automatic Mode
-        for (Ultrasonic sensor : sensors)
-            sensor.setAutomaticMode(true);
-
-        // Ultrasonic range
-        range = Constants.MISC.ultrasonic_range;
+        slots[3] = Constants.VICTORSP.balance; // Shooter slot
 
         // Initialize Limit Switch
         lmtSwitch = new DigitalInput[4];
@@ -104,77 +76,54 @@ public class shootingSubsystem extends SubsystemBase {
         lmtSwitch[2] = Constants.DIO.siding_right; // Siding (Right)
         lmtSwitch[3] = Constants.DIO.siding_left; // Siding (Left)
 
-        // Toggles
-        manual_mode = false;
-        auto_mode = false;
-        prev_auto_mode_state = false;
-
         // Timers
-        feeding_extender_timer = Constants.MISC.top_slot_timer;
-        ball_loading_timer = Constants.MISC.feeder_timer;
         pushing_timer = Constants.MISC.push_timer;
-        ball_presence_timer = Constants.MISC.ball_presence_timer;
-        ball_presence_timer.start();
+
+        // Boolean
+        real_auto = false;
+        auto_mode = false;
 
         // Initialize joystick
-        stickB = Constants.MISC.joystick_b;
+        stickA = Constants.MISC.joystick_a;
     }
 
     public void shooting() {
         // Manual shooting
-        if (ball_present)
-            manualShooting();
-        else {
-            spin(0);
-            push.set(0);
-        }
+        manualShooting();
         // Manual siding and lifting
         /**/
-
-        if (auto_mode) {
-            if (!manual_mode)
-                sidingAndLifting();
-            else
-                manualSidingAndLifting();
+        if (real_auto) {
+            sidingAndLifting();
         } else {
-            siding.set(ControlMode.PercentOutput, 0);
-            //lifting.set(ControlMode.PercentOutput, 0);
+            manualSidingAndLifting();
         }
 
-        // Reloading
-        if (!stickB.getRawButton(4) && !stickB.getRawButton(6))
-            reloading();
+        if (stickA.getRawButtonPressed(10))
+            auto_mode = !auto_mode;
+
+        real_auto = (auto_mode && ballFeed.detect(4, ballFeed.range+ 80));
 
         // SmartDashboard
         smartDashboard();
-
-        // Toggle
-        if (stickB.getRawButtonPressed(8))
-            manual_mode = !manual_mode;
-
-        if (stickB.getRawButtonPressed(10))
-            auto_mode = !auto_mode;
-
-
     }
 
     // Manual shooting
     private void manualShooting() {
-        // If trigger is pressed
-        if (stickB.getTop())
+        // Charge motors
+        if (stickA.getTop()){
             spin(0.7);
-            // Else, set the motors to 0
+        }
         else
             spin(0);
 
-        if (stickB.getTrigger() && stickB.getTop()) {
+        if (stickA.getTrigger() && stickA.getTop()) {
             push.set(0.6);
             pushing_timer.start();
-            ball_present = false;
+                ballFeed.ball_present = false;
         } else {
             push.set(0);
             if (pushing_timer.get() > 1) {
-                ball_loading_timer.start();
+                ballFeed.ball_loading_timer.start();
                 pushing_timer.stop();
                 pushing_timer.reset();
             }
@@ -194,20 +143,20 @@ public class shootingSubsystem extends SubsystemBase {
 
         // Manual siding and lifting movement
         // Siding
-        if (!lmtSwitch[2].get() && stickB.getX() > 0)
-            outputX = 0.3 * -stickB.getX();
-        else if (!lmtSwitch[3].get() && stickB.getX() < 0)
-            outputX = 0.3 * -stickB.getX();
+        if (!lmtSwitch[2].get() && stickA.getX() > 0)
+            outputX = 0.18 * -stickA.getX();
+        else if (!lmtSwitch[3].get() && stickA.getX() < 0)
+            outputX = 0.18 * -stickA.getX();
         else if (lmtSwitch[2].get() && lmtSwitch[3].get())
-            outputX = 0.3 * -stickB.getX();
+            outputX = 0.18 * -stickA.getX();
 
         // Lifting
-        if (!lmtSwitch[0].get() && -stickB.getY() > 0)
-            outputY = 0.3 * -stickB.getY();
-        else if (!lmtSwitch[1].get() && -stickB.getY() < 0)
-            outputY = 0.3 * -stickB.getY();
+        if (!lmtSwitch[0].get() && -stickA.getY() > 0)
+            outputY = 0.15 * -stickA.getY();
+        else if (!lmtSwitch[1].get() && -stickA.getY() < 0)
+            outputY = 0.15 * -stickA.getY();
         else if (lmtSwitch[0].get() && lmtSwitch[1].get())
-            outputY = 0.3 * -stickB.getY();
+            outputY = 0.15 * -stickA.getY();
 
         // Set values
         siding.set(ControlMode.PercentOutput, outputX);
@@ -239,9 +188,9 @@ public class shootingSubsystem extends SubsystemBase {
                 if (!lmtSwitch[2].get() || !lmtSwitch[3].get()) {
                     SmartDashboard.putBoolean("LimitSwitchX?", true);
                     if (!lmtSwitch[2].get() && outputX > 0)
-                        siding.set(ControlMode.PercentOutput, outputX);
+                        siding.set(ControlMode.PercentOutput, -outputX);
                     else if (!lmtSwitch[3].get() && outputX < 0)
-                        siding.set(ControlMode.PercentOutput, outputX);
+                        siding.set(ControlMode.PercentOutput, -outputX);
                 } else {
                     SmartDashboard.putBoolean("LimitSwitchX?", false);
                     siding.set(ControlMode.PercentOutput, outputX);
@@ -275,100 +224,13 @@ public class shootingSubsystem extends SubsystemBase {
             lifting.set(ControlMode.PercentOutput, 0);
         }
     }
-
-    // Prepare ball for shooting
-    private void prepareBallForShooting() {
-        if (ball_loading_timer.get() > 0.5) {
-            prev_auto_mode_state = auto_mode;
-            auto_mode = false;
-            if (ball_loading_limit_switch) {
-                if (ball_loading_timer.get() > 0.5 && ball_loading_timer.get() < 0.75) {
-                    slots[3].set(0.2);
-                    lifting.set(ControlMode.PercentOutput, 0);
-                }
-                if (ball_loading_timer.get() > 0.75 && ball_loading_timer.get() < 1.25)
-                    slots[3].set(-0.2);
-                if (ball_loading_timer.get() > 1.25) {
-                    slots[3].set(0);
-                    ball_loading_timer.stop();
-                    ball_loading_timer.reset();
-                    auto_mode = prev_auto_mode_state;
-                }
-            } else {
-                lifting.set(ControlMode.PercentOutput, -0.25);
-                if (!lmtSwitch[0].get())
-                    ball_loading_limit_switch = true;
-            }
-        }
-    }
-
-    // Reloading
-    private void reloading() {
-        // Motor (0)
-        if ((stickB.getRawButton(7) && !detect(0, range)) ||
-                (!detect(1, range) && detect(0, range))) {
-            slots[0].set(0.6);
-        } else {
-            slots[0].set(0);
-        }
-        // Motor (1)
-        if ((!detect(1, range) && detect(0, range)) ||
-                (!detect(2, range) && detect(1, range))) {
-            slots[1].set(0.6);
-        } else {
-            slots[1].set(0);
-        }
-        // Motor (2)
-        if ((!detect(2, range) && detect(1, range)) ||
-                (!detect(3, range) && detect(2, range))) {
-            slots[2].set(0.6);
-            feeding_extender_timer.start();
-        } else {
-            if (!detect(3, range)) {
-                if (feeding_extender_timer.get() > 0.25) {
-                    slots[2].set(0);
-                    feeding_extender_timer.stop();
-                    feeding_extender_timer.reset();
-                }
-            } else
-                slots[2].set(0);
-        }
-        // Prepare ball for shooting
-        // No ball in shooter && ball in feeder
-        if ((!ball_present && detect(3, range))) {
-            if (ball_loading_timer.get() == 0)
-                ball_loading_timer.start();
-            prepareBallForShooting();
-        } else {
-            //lifting.set(ControlMode.PercentOutput, 0);
-            slots[3].set(0);
-        }
-        if (detect(4, range + 80) && ball_presence_timer.get() > 1) {
-            ball_present = true;
-            ball_presence_timer.reset();
-        }
-    }
-
-    private boolean detect(int i, double range) {
-        return sensors[i].getRangeMM() < range || sensors[i].getRangeMM() > 600;
-    }
-
     // Smart Dashboard
     private void smartDashboard() {
         SmartDashboard.putBoolean("Lifting (Min)", !lmtSwitch[0].get());
         SmartDashboard.putBoolean("Lifting (Max)", !lmtSwitch[1].get());
         SmartDashboard.putBoolean("Siding (Right)", !lmtSwitch[2].get());
         SmartDashboard.putBoolean("Siding (Left)", !lmtSwitch[3].get());
-        SmartDashboard.putBoolean("Manual?", manual_mode);
         SmartDashboard.putBoolean("Auto?", auto_mode);
-
-        for (int i = 0; i < sensors.length; i++) {
-            SmartDashboard.putNumber("Ultrasonic[" + i + "]", sensors[i].getRangeMM());
-            if (i == 4)
-                SmartDashboard.putBoolean("Ultrasonic[" + i + "] Detection", ball_present);
-            else
-                SmartDashboard.putBoolean("Ultrasonic[" + i + "] Detection", detect(i, range));
-        }
     }
 }
 
