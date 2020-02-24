@@ -9,6 +9,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import frc.robot.Constants;
 
+import java.util.ArrayList;
+
 public class shootingSubsystem extends SubsystemBase {
 
     // Motors
@@ -19,9 +21,7 @@ public class shootingSubsystem extends SubsystemBase {
     // Siding and lifting
     TalonSRX siding;
     TalonSRX lifting;
-    // Ball Slots
-    VictorSP[] slots;
-
+    
     // Subsystems
     shootingPIDSubsystem PID;
     ballFeedingSubsystem ballFeed;
@@ -40,6 +40,7 @@ public class shootingSubsystem extends SubsystemBase {
     // Booleans
     boolean auto_mode;
     boolean real_auto;
+    boolean reloading;
 
     // Pushing timer
     Timer pushing_timer;
@@ -61,13 +62,7 @@ public class shootingSubsystem extends SubsystemBase {
         siding = Constants.CAN.siding;
         lifting = Constants.CAN.lifting;
         lifting.setNeutralMode(NeutralMode.Brake);
-
-        // Initialize slot motors
-        slots = new VictorSP[4];
-        slots[0] = Constants.VICTORSP.bot_slot; // Bottom slot motor
-        slots[1] = Constants.VICTORSP.mid_slot; // Mid slot motor
-        slots[2] = Constants.VICTORSP.top_slot; // Top slot motor
-        slots[3] = Constants.VICTORSP.balance; // Shooter slot
+        siding.setNeutralMode(NeutralMode.Brake);
 
         // Initialize Limit Switch
         lmtSwitch = new DigitalInput[4];
@@ -82,6 +77,7 @@ public class shootingSubsystem extends SubsystemBase {
         // Boolean
         real_auto = false;
         auto_mode = false;
+        reloading = false;
 
         // Initialize joystick
         stickA = Constants.MISC.joystick_a;
@@ -92,14 +88,18 @@ public class shootingSubsystem extends SubsystemBase {
         manualShooting();
         // Manual siding and lifting
         /**/
-        if (real_auto) {
+        if (real_auto)
             sidingAndLifting();
-        } else {
-            manualSidingAndLifting();
+        else {
+            if (!reloading)
+                manualSidingAndLifting();
         }
 
-        if (stickA.getRawButtonPressed(10))
+        SmartDashboard.putBoolean("asd", reloading);
+        if (stickA.getRawButtonPressed(10)) {
             auto_mode = !auto_mode;
+            pid_reset();
+        }
 
         real_auto = (auto_mode && ballFeed.detect(4, ballFeed.range+ 80));
 
@@ -111,7 +111,7 @@ public class shootingSubsystem extends SubsystemBase {
     private void manualShooting() {
         // Charge motors
         if (stickA.getTop()){
-            spin(0.7);
+            spin(0.85);
         }
         else
             spin(0);
@@ -121,13 +121,21 @@ public class shootingSubsystem extends SubsystemBase {
             pushing_timer.start();
                 ballFeed.ball_present = false;
         } else {
-            push.set(0);
-            if (pushing_timer.get() > 1) {
-                ballFeed.ball_loading_timer.start();
-                pushing_timer.stop();
-                pushing_timer.reset();
+            if (pushing_timer.get() > 0.5) {
+                pid_reset();
             }
         }
+    }
+
+    private void pid_reset(){
+        PID.integral_y = 0;
+        PID.previous_error_y = 0;
+        PID.last_errors_y = new ArrayList<Double>();
+        PID.last_errors_y_idy = 0;
+        push.set(0);
+        ballFeed.ball_loading_timer.start();
+        pushing_timer.stop();
+        pushing_timer.reset();
     }
 
     private void spin(double mode) {
@@ -169,14 +177,15 @@ public class shootingSubsystem extends SubsystemBase {
         if (SmartDashboard.getBoolean("found", false)) {
             // Get values from NetworkTable (RaspberryPi)
             cX = SmartDashboard.getNumber("cX", 0);
-            cY = SmartDashboard.getNumber("cY", 0);
+            cY = SmartDashboard.getNumber("cY",
+                    0);
             imgWidCenter = SmartDashboard.getNumber("imgW", 1) / 2;
             imgHiCenter = SmartDashboard.getNumber("imgH", 1) / 2;
             SmartDashboard.putNumber("imgWCenter", imgWidCenter);
             SmartDashboard.putNumber("imgHCenter", imgHiCenter);
 
-            outputX = PID.PID_X(imgWidCenter, cX) * 0.01;
-            outputY = PID.PID_Y(imgHiCenter + 30, cY) * 0.01;
+            outputX = PID.PID_X(imgWidCenter + 60, cX) * 0.01;
+            outputY = PID.PID_Y(imgHiCenter - 15, cY) * 0.01;
 
             SmartDashboard.putNumber("outputX", outputX);
             SmartDashboard.putNumber("outputY", outputY);
@@ -187,10 +196,10 @@ public class shootingSubsystem extends SubsystemBase {
                 SmartDashboard.putBoolean("CenteredX?", false);
                 if (!lmtSwitch[2].get() || !lmtSwitch[3].get()) {
                     SmartDashboard.putBoolean("LimitSwitchX?", true);
-                    if (!lmtSwitch[2].get() && outputX > 0)
-                        siding.set(ControlMode.PercentOutput, -outputX);
-                    else if (!lmtSwitch[3].get() && outputX < 0)
-                        siding.set(ControlMode.PercentOutput, -outputX);
+                    if (!lmtSwitch[2].get() && outputX < 0)
+                        siding.set(ControlMode.PercentOutput, outputX);
+                    else if (!lmtSwitch[3].get() && outputX > 0)
+                        siding.set(ControlMode.PercentOutput, outputX);
                 } else {
                     SmartDashboard.putBoolean("LimitSwitchX?", false);
                     siding.set(ControlMode.PercentOutput, outputX);

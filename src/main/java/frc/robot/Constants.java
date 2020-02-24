@@ -22,8 +22,8 @@ public class Constants {
         public static final double Ix = 0.05;
         public static final double Dx = 0.04;
         public static final double Py = 0.12;
-        public static final double Iy = 0.08;
-        public static final double Dy = 0.01;
+        public static final double Iy = 0.09;
+        public static final double Dy = 0.00;
             // Integer
         public static final int ultrasonic_range = 100;
             // Accelerometer

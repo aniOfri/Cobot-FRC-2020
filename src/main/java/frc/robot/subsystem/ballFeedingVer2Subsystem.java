@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class ballFeedingSubsystem extends SubsystemBase {
+public class ballFeedingVer2Subsystem extends SubsystemBase {
 
     // Joystick
     Joystick stickA;
-    
+
     // Constants
     int range;
 
@@ -37,7 +37,7 @@ public class ballFeedingSubsystem extends SubsystemBase {
     Timer feeding_extender_timer;
     Timer ball_presence_timer;
 
-    public ballFeedingSubsystem() {
+    public ballFeedingVer2Subsystem() {
         // Subsystem
         shoot = Constants.MISC.shoot;
 
@@ -48,14 +48,12 @@ public class ballFeedingSubsystem extends SubsystemBase {
         sensors[2] = Constants.ULTRASONIC.top_slot_sens;
         sensors[3] = Constants.ULTRASONIC.top_shoot_sens;
         sensors[4] = Constants.ULTRASONIC.bot_shoot_sens;
-        
+
         // Initialize slot motors
-        slots = new VictorSP[4];
+        slots = new VictorSP[2];
         slots[0] = Constants.VICTORSP.bot_slot; // Bottom slot motor
-        slots[1] = Constants.VICTORSP.mid_slot; // Mid slot motor
-        slots[2] = Constants.VICTORSP.top_slot; // Top slot motor
-        slots[3] = Constants.VICTORSP.balance; // Shooter slot
-    
+        slots[1] = Constants.VICTORSP.balance; // Shooter slot
+
         // Set Automatic Mode
         for (Ultrasonic sensor : sensors)
             sensor.setAutomaticMode(true);
@@ -123,24 +121,15 @@ public class ballFeedingSubsystem extends SubsystemBase {
 
     // Reloading
     private void reloading() {
-        // Motor (0)
-        if ((stickA.getRawButton(7) && !detect(0, range)) ||
-                (!detect(1, range) && detect(0, range))) {
-            slots[0].set(0.6);
-        } else {
+        if(stickA.getRawButton(7) && !detect(2, range)){
+            slots[0].set(0.5);
+        }
+        else{
             slots[0].set(0);
         }
-        // Motor (1)
-        if ((!detect(1, range) && detect(0, range)) ||
-                (!detect(2, range) && detect(1, range))) {
-                    slots[1].set(0.6);
-        } else {
-            slots[1].set(0);
-        }
         // Motor (2)
-        if ((!detect(2, range) && detect(1, range)) ||
-                (!detect(3, range) && detect(2, range))) {
-                    slots[2].set(0.5);
+        if ((!detect(3, range) && detect(2, range))) {
+            slots[2].set(0.5);
             feeding_extender_timer.start();
         } else {
             if (!detect(3, range)) {
@@ -161,11 +150,11 @@ public class ballFeedingSubsystem extends SubsystemBase {
         }
         else {
             //lifting.set(ControlMode.PercentOutput, 0);
-            slots[3].set(0);
+                slots[3].set(0);
 
-        if (ball_loading_timer.get() > 0){
-            prepareBallForShooting();
-        }
+            if (ball_loading_timer.get() > 0){
+                prepareBallForShooting();
+            }
         }
     }
 

@@ -5,8 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
-
 // Motors and sensors chart:
 /*
   Joystick:
@@ -59,6 +57,9 @@ Ultrasonic [name] = new Ultrasonic(4, 5); # Bottom Ultrasonic (Trig:Yellow, Echo
       Cable 2:
 Ultrasonic [name] = new Ultrasonic(6, 7); # Shooter top Ultrasonic (Trig:Green, Echo:White)
 Ultrasonic [name] = new Ultrasonic(8, 9); # Shooter bottom Ultrasonic (Trig:Blue, Echo:Yellow)
+      Cable 3:
+Ultrasonic [name] = new Ultrasonic(14, 15); # Right height Ultrasonic Ultrasonic (Trig:Green, Echo:Yellow)
+Ultrasonic [name] = new Ultrasonic(17, 16); # Left height Ultrasonic (Trig:Orange, Echo:Blue)
 
 
  */
@@ -87,7 +88,9 @@ package frc.robot;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystem.ballFeedingSubsystem;
+import frc.robot.subsystem.ballFeedingVer2Subsystem;
 import frc.robot.subsystem.climbingSubsystem;
 import frc.robot.subsystem.drivingSubsystem;
 import frc.robot.subsystem.shootingSubsystem;
@@ -95,10 +98,14 @@ import frc.robot.subsystem.shootingSubsystem;
 public class Robot extends TimedRobot {
 
   UsbCamera usbCam;
+  UsbCamera usbCam2;
   drivingSubsystem drive;
   climbingSubsystem climb;
   shootingSubsystem shoot;
-  ballFeedingSubsystem ballFeed;
+  ballFeedingVer2Subsystem ballFeed;
+
+  // Ball Feeding or Climbing
+  boolean isClimbing;
 
   @Override
   public void robotInit() {
@@ -106,26 +113,55 @@ public class Robot extends TimedRobot {
     shoot = Constants.MISC.shoot;
     drive = new drivingSubsystem();
     climb = new climbingSubsystem();
-    ballFeed = new ballFeedingSubsystem();
+    ballFeed = new ballFeedingVer2Subsystem();
+
+    // Ball Feeding or Climbing
+    isClimbing = false;
+
 
     // Initialize and configure usbCam
     usbCam = CameraServer.getInstance().startAutomaticCapture();
+    usbCam2 = CameraServer.getInstance().startAutomaticCapture();
     usbCam.setResolution(320,240);
+    usbCam2.setResolution(320,240);
+    usbCam2.setFPS(15);
     }
 
   @Override
 
   public void robotPeriodic() {
+    // Toggle
+    if (Constants.MISC.joystick_a.getRawButtonPressed(11))
+      isClimbing = !isClimbing;
+
     // Driving
     drive.driving();
 
-    // Climbing
-    climb.climbing();
-
-    // Ball Feeding
-    ballFeed.ballFeeding();
+    if (!isClimbing) {
+      // Ball Feeding
+      ballFeed.ballFeeding();
+      climb.auto_balance = false;
+      climb.spinR(0);
+      climb.spinL(0);
+      SmartDashboard.putBoolean("autoBalance?", false);
+    }
+    else
+      // Climbing
+      climb.climbing();
 
     // Shooting
     shoot.shooting();
+
+    // SmartDashboard
+    SmartDashboard.putBoolean("isClimbing?", isClimbing);
+  }
+
+  @Override
+  public void autonomousInit() {
+  }
+
+
+  public void autonomousPeriodic(){
+    drive.autonomous();
   }
 }
