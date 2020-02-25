@@ -2,7 +2,11 @@ package frc.robot.subsystem;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.TimedCommand;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -55,10 +59,17 @@ public class drivingSubsystem extends SubsystemBase{
         //yVal controls the speed of the driving   
         diffDrive.curvatureDrive(yVal, xVal, true);
     }
-    public void autonomous(){
-        diffDrive.arcadeDrive(0.6,0);
-        Timer.delay(2);
-        diffDrive.arcadeDrive(0,0);
+    public CommandBase autonomous(){
+       return new RunCommand(new Runnable() {
+            @Override
+            public void run() {
+                diffDrive.arcadeDrive(0.2,0);
+            }
+        }, this).withTimeout(2);
+    }
+
+    public void stop(){
+        this.diffDrive.arcadeDrive(0,0);
     }
 
 }

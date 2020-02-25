@@ -89,6 +89,9 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystem.ballFeedingSubsystem;
 import frc.robot.subsystem.ballFeedingVer2Subsystem;
 import frc.robot.subsystem.climbingSubsystem;
@@ -158,10 +161,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    CommandScheduler.getInstance().schedule(new SequentialCommandGroup(drive.autonomous(), new InstantCommand(new Runnable() {
+      @Override
+      public void run() {
+        drive.stop();
+      }
+    })));
   }
 
 
   public void autonomousPeriodic(){
-    drive.autonomous();
+    CommandScheduler.getInstance().run();
   }
 }
